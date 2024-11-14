@@ -1,0 +1,14 @@
+diff --git a/node_modules/react-native-snap-carousel/src/carousel/Carousel.tsx b/node_modules/react-native-snap-carousel/src/carousel/Carousel.tsx
+index e9daf5b..f1d1558 100644
+--- a/node_modules/react-native-snap-carousel/src/carousel/Carousel.tsx
++++ b/node_modules/react-native-snap-carousel/src/carousel/Carousel.tsx
+@@ -11,7 +11,8 @@ import {
+     NativeScrollEvent,
+     LayoutChangeEvent,
+     GestureResponderEvent,
+-    ViewStyle
++    ViewStyle,
++
+ } from 'react-native';
+ import shallowCompare from 'react-addons-shallow-compare';
+ import {

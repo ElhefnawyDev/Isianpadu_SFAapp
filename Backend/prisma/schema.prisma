@@ -1,0 +1,613 @@
+generator client {
+  provider = "prisma-client-js"
+  // previewFeatures = ["typedSql"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model adm_profile {
+  profile_id                Int       @id @default(autoincrement())
+  otp_no_update             Int?
+  fullname                  String?   @db.Text
+  id_lkp_citizenship        Int?
+  citizenship_no            String?   @db.VarChar(255)
+  gender                    String?   @db.VarChar(25)
+  bod                       DateTime? @db.Date
+  bod_place                 String?   @db.VarChar(255)
+  address                   String?   @db.VarChar(255)
+  postcode                  String?   @db.VarChar(12)
+  id_lkp_district           Int?
+  age                       Int?
+  id_lkp_race               Int?
+  id_lkp_state              Int?
+  id_lkp_country            Int?
+  id_lkp_profile_type       Int?
+  id_lkp_profile_status     Int?
+  id_lkp_position           Int?
+  id_lkp_kekerapan_mengajar Int?
+  flag_active               Int?
+  avatar                    String?   @db.VarChar(255)
+  phone_dihubungi           String?   @db.VarChar(100)
+  created_date              DateTime? @db.DateTime(0)
+  modify_date               DateTime? @db.DateTime(0)
+  created_by                Int?
+  modify_by                 Int?
+  hubungan                  String?   @db.VarChar(100)
+  id_lkp_religion           String?   @db.VarChar(11)
+  document_ic               String?   @db.VarChar(255)
+  flag_allow_app            Int?
+  flag_migration            Int
+  adm_user                  adm_user?
+}
+
+model adm_user {
+  user_id         Int          @id @default(autoincrement())
+  username        String?      @db.VarChar(255)
+  password        String?      @db.VarChar(255)
+  trans_key       String?      @db.VarChar(255)
+  id_lkp_otp_type Int?
+  id_profile      Int?         @unique
+  flag_active     Int?
+  created_date    DateTime?    @db.DateTime(0)
+  modify_date     DateTime?    @db.DateTime(0)
+  created_by      Int?
+  modify_by       Int?
+  profile         adm_profile? @relation(fields: [id_profile], references: [profile_id])
+}
+
+model bok_asset {
+  asset_id      Int      @id @default(autoincrement())
+  asset_name    String   @db.VarChar(255)
+  brand         String   @db.VarChar(255)
+  total_unit    Int
+  id_room       Int
+  created_by    Int
+  created_date  DateTime @db.DateTime(0)
+  modified_by   Int
+  modified_date DateTime @db.DateTime(0)
+}
+
+model bok_location {
+  location_id          Int      @id @default(autoincrement())
+  location_name        String   @db.VarChar(255)
+  address              String   @db.VarChar(255)
+  city                 String   @db.VarChar(255)
+  postcode             String   @db.VarChar(12)
+  id_lkp_state         Int
+  id_lkp_status_active Int
+  created_date         DateTime @db.DateTime(0)
+  created_by           Int
+  modified_date        DateTime @db.DateTime(0)
+  modified_by          Int
+}
+
+model bok_room {
+  room_id              Int      @id @default(autoincrement())
+  room_name            String   @db.VarChar(255)
+  unit_level           String   @db.VarChar(255)
+  id_location          Int
+  capacity             Int
+  id_lkp_status_active Int
+  created_by           Int
+  created_date         DateTime @db.DateTime(0)
+  modified_by          Int
+  modified_date        DateTime @db.DateTime(0)
+}
+
+model bok_room_book {
+  room_book_id       Int      @id @default(autoincrement())
+  id_room            Int
+  date_from          DateTime @db.Date
+  time_from          DateTime @db.Time(0)
+  date_to            DateTime @db.Date
+  time_to            DateTime @db.Time(0)
+  id_lkp_book_status Int
+  booked_by          Int
+  created_by         Int
+  created_date       DateTime @db.DateTime(0)
+  modified_by        Int
+  modified_date      DateTime @db.DateTime(0)
+}
+
+model category {
+  category_id   Int    @id @default(autoincrement())
+  category_name String @db.VarChar(250)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model jt_salesteam_customer_subkey_acc {
+  id_sfa_salesteam  Int
+  id_sfa_customer   Int
+  id_sfa_subkey_acc Int
+
+  @@ignore
+}
+
+model lkp_book_status {
+  book_status_id   Int      @id @default(autoincrement())
+  book_status_name String   @db.VarChar(255)
+  order_no         Int
+  created_date     DateTime @db.DateTime(0)
+  created_by       Int
+}
+
+model lkp_country {
+  id           Int       @id @default(autoincrement())
+  description  String?   @db.VarChar(255)
+  code         String?   @db.VarChar(50)
+  order_no     BigInt?
+  flag_active  Int?
+  created_date DateTime? @db.DateTime(0)
+  modify_date  DateTime? @db.DateTime(0)
+  created_by   BigInt?
+  modify_by    BigInt?
+}
+
+model lkp_district {
+  id           BigInt    @id @default(autoincrement())
+  id_lkp_state BigInt?
+  description  String?   @db.VarChar(255)
+  code         String?   @db.VarChar(50)
+  order_no     BigInt?
+  flag_active  Int?
+  created_date DateTime? @db.DateTime(0)
+  modify_date  DateTime? @db.DateTime(0)
+  created_by   BigInt?
+  modify_by    BigInt?
+}
+
+model lkp_profile_type {
+  profile_type_id BigInt    @id @default(autoincrement())
+  description     String?   @db.VarChar(255)
+  code            String?   @db.VarChar(25)
+  order_no        BigInt?
+  flag_active     Int?
+  created_date    DateTime? @db.DateTime(0)
+  modify_date     DateTime? @db.DateTime(0)
+  created_by      BigInt?
+  modify_by       BigInt?
+}
+
+model lkp_state {
+  state_id     BigInt    @id @default(autoincrement())
+  state_name   String?   @db.VarChar(255)
+  code         String?   @db.VarChar(50)
+  order_no     BigInt?
+  flag_active  Int?
+  created_date DateTime? @db.DateTime(0)
+  modify_date  DateTime? @db.DateTime(0)
+  created_by   BigInt?
+  modify_by    BigInt?
+}
+
+model lkp_status_active {
+  status_id    Int      @id @default(autoincrement())
+  status_name  String   @db.VarChar(255)
+  order_no     Int
+  created_date DateTime @db.DateTime(0)
+  created_by   Int
+}
+
+model org_organization {
+  org_id                   Int    @id @default(autoincrement())
+  org_name                 String @db.VarChar(255)
+  shortname                String @db.VarChar(100)
+  website                  String @db.VarChar(255)
+  ssm_no                   String @db.VarChar(100)
+  address                  String @db.VarChar(255)
+  postcode                 String @db.VarChar(10)
+  city                     String @db.VarChar(255)
+  id_lkp_state             Int
+  id_lkp_country           Int
+  id_lkp_organization_type Int
+}
+
+model org_organization_type {
+  org_type_id   Int    @id @default(autoincrement())
+  org_type_name String @db.VarChar(255)
+  order_no      Int
+  id_status     Int
+}
+
+model pro_project {
+  project_id            Int      @id @default(autoincrement())
+  project_name          String   @db.VarChar(255)
+  project_short_name    String   @db.Text
+  customer_id           Int
+  contract_no           String   @db.VarChar(100)
+  project_from          DateTime @db.Date
+  project_to            DateTime @db.Date
+  id_project_activity   String   @db.VarChar(255)
+  project_extend        Int
+  id_lkp_project_status Int
+  created_by            Int
+  modified_by           Int
+  created_date          DateTime @db.DateTime(0)
+  modified_date         DateTime @db.DateTime(0)
+}
+
+model pro_project_activity {
+  activity_id             Int      @id @default(autoincrement())
+  id_project              Int
+  id_lkp_project_activity String   @db.VarChar(255)
+  created_by              Int
+  modified_by             Int
+  created_date            DateTime @db.DateTime(0)
+  modified_date           DateTime @db.DateTime(0)
+}
+
+model pro_task {
+  task_id        Int      @id @default(autoincrement())
+  id_project     Int
+  id_activity    Int
+  task_name      String   @db.VarChar(255)
+  task_desc      String   @db.Text
+  task_from      DateTime @db.Date
+  task_to        DateTime @db.Date
+  id_task_status Int
+  created_by     Int
+  modified_by    Int
+  create_date    DateTime @db.DateTime(0)
+  modify_date    DateTime @db.DateTime(0)
+}
+
+model product {
+  id       Int    @id @default(autoincrement())
+  category Int
+  name     String @db.VarChar(250)
+  price    Float
+}
+
+model psec_logs {
+  id           Int     @id @default(autoincrement())
+  ip           String  @db.Char(45)
+  date         String  @db.VarChar(30)
+  time         String  @db.Char(5)
+  page         String  @db.VarChar(255)
+  query        String  @db.Text
+  type         String  @db.VarChar(50)
+  browser      String  @default("Unknown") @db.VarChar(255)
+  browser_code String  @db.VarChar(50)
+  os           String  @default("Unknown") @db.VarChar(255)
+  os_code      String  @db.VarChar(40)
+  country      String  @default("Unknown") @db.VarChar(120)
+  country_code String  @default("XX") @db.Char(2)
+  region       String  @default("Unknown") @db.VarChar(120)
+  city         String  @default("Unknown") @db.VarChar(120)
+  latitude     String  @default("0") @db.VarChar(30)
+  longitude    String  @default("0") @db.VarChar(30)
+  isp          String  @default("Unknown") @db.VarChar(255)
+  useragent    String  @db.Text
+  referer_url  String? @db.VarChar(255)
+}
+
+model psec_pages_layolt {
+  id   Int    @id @default(autoincrement())
+  page String @db.VarChar(30)
+  text String @db.Text
+
+  @@map("psec_pages-layolt")
+}
+
+model sec_historylog {
+  audit_id Int      @id @default(autoincrement())
+  id_user  Int
+  page     String   @db.VarChar(255)
+  action   String   @db.VarChar(255)
+  ip       String   @db.VarChar(255)
+  date     DateTime @db.Date
+  time     DateTime @db.Time(0)
+  status   Int
+}
+
+model sec_loginlogs {
+  id          Int      @id @default(autoincrement())
+  username    String   @db.VarChar(255)
+  ip          String   @db.Char(45)
+  date        DateTime @db.Date
+  time        DateTime @db.Time(0)
+  flag_status Int
+}
+
+model sfa_ally_type {
+  ally_type_id Int       @id @default(autoincrement())
+  ally_type    String    @db.VarChar(255)
+  created_date DateTime? @default(now()) @db.Timestamp(0)
+  created_by   Int
+  delete_id    Boolean
+  deleted_date DateTime? @db.Timestamp(0)
+  deleted_by   Int
+}
+
+model sfa_calendar {
+  event_id   Int      @id @default(autoincrement())
+  event_name String   @db.VarChar(255)
+  event_date DateTime @db.Date
+  event_time DateTime @db.Time(0)
+  event_desc String   @db.VarChar(255)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model sfa_client {
+  client_id       Int @id @default(autoincrement())
+  client_name     String? @db.VarChar(50)
+  client_address  String? @db.VarChar(50)
+  client_postcode String? @db.VarChar(5)
+  client_city     Int?
+  client_state    Int?
+  created_date    String? @db.VarChar(10)
+  created_by      String? @db.VarChar(10)
+  delete_id       String? @db.VarChar(10)
+  deleted_date    String? @db.VarChar(10)
+  deleted_by      String? @db.VarChar(10)
+
+  sfa_tender sfa_tender[] 
+}
+
+model sfa_cust_acc {
+  custacc_id       Int       @id @default(autoincrement())
+  id_adm_profileSP String    @db.VarChar(255)
+  key_account      String    @db.VarChar(255)
+  created_date     DateTime? @default(now()) @db.Timestamp(0)
+  created_by       Int
+  delete_id        Boolean
+  deleted_date     DateTime? @db.Timestamp(0)
+  deleted_by       Int
+}
+
+model sfa_email {
+  email_id    Int    @id @default(autoincrement())
+  email_title String @db.VarChar(255)
+  email_desc  String @db.VarChar(255)
+}
+
+model sfa_exp_alert {
+  alert_id            Int       @id @default(autoincrement())
+  alert_month         Int
+  alert_week          Int
+  alert_day           Int
+  alert_email         String    @db.VarChar(255)
+  id_sfa_registration Int
+  next_reminder       DateTime? @db.Date
+  created_date        DateTime? @default(now()) @db.Timestamp(0)
+  created_by          Int
+  delete_id           Boolean
+  deleted_date        DateTime? @db.Timestamp(0)
+  deleted_by          Int
+}
+
+model sfa_infobox {
+  infobox_id           Int    @id
+  constant_figure_name String @db.VarChar(255)
+  figure_name          String @db.VarChar(255)
+}
+
+model sfa_infogauge {
+  infogauge_id         Int     @id @default(autoincrement())
+  calculate_year       Int
+  constant_figure_name String  @db.VarChar(255)
+  figure_name          String  @db.VarChar(255)
+  target_value         Decimal @db.Decimal(20, 2)
+}
+
+model sfa_infotarget {
+  infotarget_id  Int     @id @default(autoincrement())
+  target_year    Int
+  target_value   Decimal @db.Decimal(12, 0)
+  minimum_target Decimal @db.Decimal(12, 0)
+}
+
+model sfa_notice {
+  notice_id          Int      @id @default(autoincrement())
+  id_sfa_subm_method Int
+  id_sfa_subm_type   Int
+  tender_name        String   @db.VarChar(255)
+  remarks            String   @db.VarChar(255)
+  deadline           DateTime @db.Date
+  brief_date         DateTime @db.Date
+  id_adm_profileSP   String   @db.VarChar(255)
+  id_adm_profilePS   String   @db.VarChar(255)
+  id_adm_profileSA   String   @db.VarChar(255)
+}
+
+model sfa_plan_infogauge {
+  plan_infogauge_id    Int     @id @default(autoincrement())
+  trigger_year         Int
+  start_year           Int
+  end_year             Int
+  constant_figure_name String  @db.VarChar(255)
+  figure_name          String  @db.VarChar(255)
+  target_value         Decimal @db.Decimal(20, 2)
+}
+
+model sfa_registration {
+  reg_id            Int       @id @default(autoincrement())
+  id_sfa_ally_type  String    @db.VarChar(255)
+  reg_name          String    @db.VarChar(255)
+  reg_date          DateTime  @db.Date
+  expected_reminder DateTime  @db.Date
+  expiration_date   DateTime  @db.Date
+  email             String    @db.VarChar(255)
+  address           String    @db.VarChar(255)
+  contact_person    String    @db.VarChar(255)
+  product_name      String    @db.VarChar(255)
+  created_date      DateTime? @default(now()) @db.Timestamp(0)
+  created_by        Int
+  delete_id         Boolean
+  deleted_date      DateTime? @db.Timestamp(0)
+  deleted_by        Int
+}
+
+model sfa_roles {
+  RoleID         Int              @id
+  RoleName       String           @db.VarChar(255)
+  sfa_staffroles sfa_staffroles[]
+}
+
+model sfa_salesteam {
+  staff_id      Int       @id
+  name          String?   @db.VarChar(47)
+  designation   String?   @db.VarChar(33)
+  no_phone      String?   @db.VarChar(14)
+  email         String?   @db.VarChar(35)
+  sales_role_id Int?
+  created_date  DateTime? @default(now()) @db.Timestamp(0)
+  created_by    Int
+  delete_id     Boolean
+  deleted_date  DateTime? @db.Timestamp(0)
+  deleted_by    Int
+}
+
+model sfa_salesteam_new {
+  StaffID        Int              @id @default(autoincrement())
+  StaffName      String           @db.VarChar(255)
+  sfa_staffroles sfa_staffroles[]
+}
+
+model sfa_staffroles {
+  StaffID           Int
+  RoleID            Int
+  sfa_salesteam_new sfa_salesteam_new @relation(fields: [StaffID], references: [StaffID], onUpdate: Restrict, map: "sfa_staffroles_ibfk_1")
+  sfa_roles         sfa_roles         @relation(fields: [RoleID], references: [RoleID], onUpdate: Restrict, map: "sfa_staffroles_ibfk_2")
+
+  @@id([StaffID, RoleID])
+  @@index([RoleID], map: "RoleID")
+}
+
+model sfa_stages {
+  stages_id  Int    @id @default(autoincrement())
+  stage_name String @db.VarChar(255)
+}
+
+model sfa_subkey_acc {
+  subkey_acc_id   Int       @id @default(autoincrement())
+  subkey_acc_name String    @db.VarChar(255)
+  id_sfa_custacc  Int
+  created_date    DateTime? @default(now()) @db.Timestamp(0)
+  created_by      Int
+  delete_id       Boolean
+  deleted_date    DateTime? @db.Timestamp(0)
+  deleted_by      Int
+}
+
+model sfa_subm_method {
+  subm_method_id Int       @id @default(autoincrement())
+  subm_method    String    @db.VarChar(255)
+  created_date   DateTime? @default(now()) @db.Timestamp(0)
+  created_by     Int
+  delete_id      Boolean
+  deleted_date   DateTime? @db.Timestamp(0)
+  deleted_by     Int
+}
+
+model sfa_subm_type {
+  subm_type_id Int       @id @default(autoincrement())
+  subm_type    String    @db.VarChar(255)
+  created_date DateTime? @default(now()) @db.Timestamp(0)
+  created_by   Int
+  delete_id    Boolean
+  deleted_date DateTime? @db.Timestamp(0)
+  deleted_by   Int
+}
+
+model sfa_tender {
+  tender_id                     Int       @id @default(autoincrement())
+  tender_code                   String    @db.VarChar(255)
+  tender_shortname              String    @db.LongText
+  tender_fullname               String    @db.Text
+  id_sfa_subm_method            Int
+  id_sfa_subm_type              Int
+  id_sfa_client                 Int
+  id_adm_profileSP              Int
+  id_adm_profileSA              Int
+  id_adm_profilePS              Int
+  id_sfa_stages                 Int
+  display_notice_id             Boolean?
+  id_sfa_tender_category        Int
+  deadline                      DateTime? @db.Date
+  brief_date                    DateTime? @db.Date
+  tender_value                  Decimal?  @db.Decimal(20, 2)
+  tender_cost                   Decimal?  @db.Decimal(20, 2)
+  tender_purchase_date          DateTime? @db.Date
+  tender_purchase_amount        Decimal?  @db.Decimal(20, 2)
+  indicative_price              Decimal?  @db.Decimal(20, 2)
+  implement_period              Int?
+  contract_period               Int?
+  total_proposed_contract_value Decimal?  @db.Decimal(10, 0)
+  exp_project_start             DateTime? @db.Date
+  scope_services                String?   @db.LongText
+  implement_plan                String?   @db.LongText
+  winning_implement_strategy    String?   @db.LongText
+  project_clarification         String?   @db.LongText
+  status                        String?   @db.VarChar(255)
+  loa_date                      DateTime? @db.Date
+  remarks                       String?   @db.VarChar(255)
+  created_date                  DateTime? @default(now()) @db.Timestamp(0)
+  created_by                    Int
+  delete_id                     Int
+  deleted_date                  DateTime? @db.Timestamp(0)
+  deleted_by                    Int
+  sfa_client                   sfa_client @relation(fields: [id_sfa_client], references: [client_id])
+}
+
+model sfa_tender_category {
+  tender_category_id Int       @id @default(autoincrement())
+  tender_category    String    @db.VarChar(255)
+  created_date       DateTime? @default(now()) @db.Timestamp(0)
+  created_by         Int
+  delete_id          Boolean
+  deleted_date       DateTime? @db.Timestamp(0)
+  deleted_by         Int
+}
+
+model sfa_testing {
+  test_id Int    @id @default(autoincrement())
+  name    String @db.VarChar(255)
+  email   String @db.VarChar(255)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model sheet1 {
+  tender_id                     Int?
+  tender_code                   String?  @db.VarChar(26)
+  tender_shortname              String?  @db.VarChar(200)
+  tender_fullname               String?  @db.VarChar(118)
+  id_sfa_subm_method            String?  @db.VarChar(10)
+  id_sfa_subm_type              String?  @db.VarChar(10)
+  id_sfa_client                 Int?
+  id_adm_profileSP              String?  @db.VarChar(10)
+  id_adm_profileSA              String?  @db.VarChar(10)
+  id_adm_profilePS              String?  @db.VarChar(10)
+  id_sfa_stages                 Int?
+  display_notice_id             String?  @db.VarChar(10)
+  id_sfa_tender_category        Int?
+  deadline                      String?  @db.VarChar(10)
+  brief_date                    String?  @db.VarChar(10)
+  tender_value                  Decimal? @db.Decimal(10, 2)
+  tender_cost                   Decimal? @db.Decimal(9, 2)
+  tender_purchase_date          String?  @db.VarChar(10)
+  tender_purchase_amount        String?  @db.VarChar(10)
+  indicative_price              String?  @db.VarChar(10)
+  implement_period              String?  @db.VarChar(2)
+  contract_period               String?  @db.VarChar(2)
+  total_proposed_contract_value String?  @db.VarChar(7)
+  exp_project_start             String?  @db.VarChar(10)
+  scope_services                String?  @db.VarChar(4339)
+  implement_plan                String?  @db.VarChar(415)
+  winning_implement_strategy    String?  @db.VarChar(1971)
+  project_clarification         String?  @db.VarChar(10)
+  status                        String?  @db.VarChar(10)
+  loa_date                      String?  @db.VarChar(10)
+  remarks                       String?  @db.VarChar(214)
+  created_date                  String?  @db.VarChar(10)
+  created_by                    String?  @db.VarChar(36)
+  delete_id                     String?  @db.VarChar(10)
+  deleted_date                  String?  @db.VarChar(7)
+  deleted_by                    String?  @db.VarChar(10)
+
+  @@ignore
+}

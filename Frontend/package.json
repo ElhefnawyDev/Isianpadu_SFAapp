@@ -1,0 +1,48 @@
+{
+  "name": "sfaapp",
+  "version": "1.0.0",
+  "main": "expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "postinstall": "patch-package"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~3.2.3",
+    "@react-native-async-storage/async-storage": "^2.0.0",
+    "@react-native-community/masked-view": "^0.1.11",
+    "@react-native-masked-view/masked-view": "github:react-native-masked-view/masked-view",
+    "@react-navigation/drawer": "^6.7.2",
+    "@react-navigation/native": "^6.1.18",
+    "@react-navigation/stack": "^7.0.0",
+    "dotenv": "^16.4.5",
+    "expo": "~51.0.28",
+    "expo-constants": "^16.0.2",
+    "expo-linear-gradient": "~13.0.2",
+    "expo-status-bar": "~1.12.1",
+    "lodash": "^4.17.21",
+    "patch-package": "^8.0.0",
+    "react": "18.2.0",
+    "react-dom": "^18.2.0",
+    "react-native": "0.74.5",
+    "react-native-calendars": "^1.1307.0",
+    "react-native-gesture-handler": "~2.16.1",
+    "react-native-gifted-charts": "^1.4.47",
+    "react-native-linear-gradient": "^2.8.3",
+    "react-native-masked-view": "^0.2.0",
+    "react-native-reanimated": "~3.10.1",
+    "react-native-safe-area-context": "^4.14.0",
+    "react-native-screens": "^3.35.0",
+    "react-native-snap-carousel": "^4.0.0-beta.6",
+    "react-native-speedometer": "^1.0.5",
+    "react-native-svg": "^15.8.0",
+    "react-native-web": "^0.19.13",
+    "react-navigation": "^5.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0"
+  },
+  "private": true
+}
