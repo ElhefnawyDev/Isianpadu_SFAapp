@@ -4,7 +4,7 @@ import { useFonts } from 'expo-font';
 
 
 
-const LowProgress1 = () => {
+const GreenStatusCard2 = () => {
   const [fontsLoaded] = useFonts({
     'FuzzyBubbles-Regular': require('../../../assets/fonts/FuzzyBubbles-Regular.ttf'),
   });
@@ -14,10 +14,10 @@ const LowProgress1 = () => {
   return (
     <View style={[styles.card, styles.greenBackground]}>
       <Text style={{fontSize: 15, color:'white', textTransform:'capitalize' }}>
-      You're planting <Text style={styles.greenText}>seeds, 🌱</Text>
+      You're <Text style={styles.greenText}>unstoppable, 🏆</Text>
       </Text>
       <View style={styles.rowContainer}>
-        <Text style={{ fontFamily: 'FuzzyBubbles-Regular', fontSize: 14, color:'white' }}>keep growing strong!</Text>
+        <Text style={{ fontFamily: 'FuzzyBubbles-Regular', fontSize: 14, color:'white' }}>keep that energy up!</Text>
     
       </View>
         </View>
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   greenText: {
-    color: 'red', // Green text
+    color: 'green', // Green text
   },
   arrowText: {
     fontSize: 50,
@@ -66,4 +66,4 @@ left:55,
   },
 });
 
-export default LowProgress1;
+export default GreenStatusCard2;

@@ -65,7 +65,7 @@ const Calendar = () => {
             [selectedDate]: { selected: true, selectedColor: "#00adf5", selectedTextColor: "#ffffff" },
           }}
           theme={{
-            calendarBackground: "#F3F4F6",
+            calendarBackground: "#f5f7fa",
             dayTextColor: "#000000",
             monthTextColor: "#333333",
             arrowColor: "#00adf5",

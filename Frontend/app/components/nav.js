@@ -22,7 +22,7 @@ import Calendar from "../screens/calenderr";
 const screenWidth = Dimensions.get("window").width;
 
 const Nav = ({selectedYear}) => {
-  const [selectedView, setSelectedView] = useState(null);
+  const [selectedView, setSelectedView] = useState("viw1"); // Set "viw1" as the default view
 
   const handlePressViw1 = () => setSelectedView("viw1");
   const handlePressViw2 = () => setSelectedView("viw2");
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     height: 50,
-    backgroundColor: "white",
+    backgroundColor: "#F5F7FA",
   },
   viw1: {
     width: "33.3%",
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   unselectedText: {
-    color: "white",
+    color: "#F5F7FA",
     fontSize: 16,
   },
   headerText: {

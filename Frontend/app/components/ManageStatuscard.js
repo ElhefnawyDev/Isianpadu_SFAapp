@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import GreenStatusCard from "./StatusCards/High/greenProgress";
+import GreenStatusCard2 from "./StatusCards/High/greenProgress2";
+import GreenStatusCard3 from "./StatusCards/High/greenProgress3";
 import MediumProgress1 from "./StatusCards/Medium/MediumProgress1";
 import LowProgress1 from "./StatusCards/low/LowProgress1";
+import LowProgress2 from "./StatusCards/low/LowProgress2";
+import LowProgress3 from "./StatusCards/low/LowProgress3";
 import { API_URL } from "../../env";
+import MediumProgress2 from "./StatusCards/Medium/MediumProgress2";
+import MediumProgress3 from "./StatusCards/Medium/MediumProgress3";
 
 const ManageStatusCard = ({ year }) => {
   const [statusColor, setStatusColor] = useState(null);
+  const [randomComponent, setRandomComponent] = useState(1);
   const [totalTenderValue, setTotalTenderValue] = useState(0);
   const [yearlyTarget, setYearlyTarget] = useState(0);
 
-  // Use useEffect to fetch data and check status whenever the year prop changes
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -24,18 +30,13 @@ const ManageStatusCard = ({ year }) => {
 
         const infoTender = await resOne.json();
 
-        // Retrieve minimum target and target value for the selected year
         const targetData = infoTender.data;
         if (targetData) {
           const yearlyTarget = parseFloat(targetData.yearly_target) || 0;
-          const totalTenderValue =
-            parseFloat(targetData.total_tender_value) || 0;
+          const totalTenderValue = parseFloat(targetData.total_tender_value) || 0;
 
           setYearlyTarget(yearlyTarget);
           setTotalTenderValue(totalTenderValue);
-
-          console.log("Yearly Target: ", yearlyTarget);
-          console.log("Total Tender Value: ", totalTenderValue);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -48,36 +49,42 @@ const ManageStatusCard = ({ year }) => {
   // Function to calculate and check the progress percentage
   const checkStatus = () => {
     if (totalTenderValue && yearlyTarget) {
-      const currentStatus = (totalTenderValue / yearlyTarget) * 100; // Calculate progress percentage
-      
-      console.log(`Calculated Progress: ${currentStatus}%`);
+      const currentStatus = (totalTenderValue / yearlyTarget) * 100;
+      const randomChoice = Math.floor(Math.random() * 3) + 1; // Generate random number between 1 and 3
 
-      // Check the progress and set the corresponding color
       if (currentStatus < 33) {
-        setStatusColor("red"); // Low progress (below 33%)
+        setStatusColor("red");
       } else if (currentStatus >= 33 && currentStatus < 66) {
-        setStatusColor("blue"); // Medium progress (33% to 65%)
+        setStatusColor("blue");
       } else if (currentStatus >= 66) {
-        setStatusColor("green"); // High progress (66% and above)
+        setStatusColor("green");
       } else {
-        setStatusColor(null); // Default to null if the value is unexpected
+        setStatusColor(null);
       }
+
+      setRandomComponent(randomChoice); // Update random choice for component selection
     } else {
-      setStatusColor(null); // Handle missing or invalid data
+      setStatusColor(null);
     }
   };
 
   useEffect(() => {
-    checkStatus(); // Call checkStatus whenever `yearlyTarget` or `totalTenderValue` changes
+    checkStatus();
   }, [yearlyTarget, totalTenderValue]);
 
-  return (
-    <View>
-      {statusColor === "red" && <LowProgress1 />}
-      {statusColor === "blue" && <MediumProgress1 />}
-      {statusColor === "green" && <GreenStatusCard />}
-    </View>
-  );
+  const renderComponent = () => {
+    if (statusColor === "red") {
+      return randomComponent === 1 ? <LowProgress1 /> : randomComponent === 2 ? <LowProgress2 /> : <LowProgress3 />;
+    } else if (statusColor === "blue") {
+      return randomComponent === 1 ? <MediumProgress1 /> : randomComponent === 2 ? <MediumProgress2 /> : <MediumProgress3 />;
+    } else if (statusColor === "green") {
+      return randomComponent === 1 ? <GreenStatusCard /> : randomComponent === 2 ? <GreenStatusCard2 /> : <GreenStatusCard3 />;
+    } else {
+      return null;
+    }
+  };
+
+  return <View>{renderComponent()}</View>;
 };
 
 export default ManageStatusCard;
