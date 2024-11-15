@@ -6,6 +6,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState("");
+  const [userInfo, setUserInfo] = useState(null); // Add userInfo state to store the user data
 
   // Function to save the token to AsyncStorage
   const saveToken = async (userToken) => {
@@ -16,7 +17,6 @@ export const AuthProvider = ({ children }) => {
 
       console.log("Token saved.");
       const localToken = await AsyncStorage.getItem("userToken");
-      // console.log(`Here is my local token: ${localToken}`);
 
       if (localToken) {
         setToken(localToken);
@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }) => {
       const info = await response.json();
       delete info.userId;
       console.log(`User info: ${JSON.stringify(info)}`);
+      setUserInfo(info); // Save user info in state
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, setToken: saveToken, removeToken }}>
+    <AuthContext.Provider value={{ token, setToken: saveToken, removeToken, userInfo }}>
       {children}
     </AuthContext.Provider>
   );

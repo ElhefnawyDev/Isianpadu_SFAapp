@@ -108,7 +108,7 @@ const BarChartComponent2 = ({year}) => {
         <View style={styles.detailRow}>
           <Text style={styles.labelText}>Amount:</Text>
           <Text style={styles.valueText}>
-            RM {selectedBar ? selectedBar.amount.toLocaleString() : "N/A"}
+             {selectedBar ? formatCurrency(parseFloat(selectedBar.amount)): "N/A"}
           </Text>
         </View>
         
@@ -119,13 +119,19 @@ const BarChartComponent2 = ({year}) => {
         
         <View style={styles.detailRow}>
           <Text style={styles.labelText}>Total Amount:</Text>
-          <Text style={styles.valueText}>RM {totalAmount.toLocaleString()}</Text>
+          <Text style={styles.valueText}> {formatCurrency(parseFloat(totalAmount))}</Text>
         </View>
       </View>
     </View>
   );
 };
-
+const formatCurrency = (num) => {
+  return new Intl.NumberFormat("en-MY", {
+    style: "currency",
+    currency: "MYR",
+    minimumFractionDigits: 2,
+  }).format(num);
+};
 const styles = StyleSheet.create({
   chartWrapper: {
     borderTopRightRadius: 10,

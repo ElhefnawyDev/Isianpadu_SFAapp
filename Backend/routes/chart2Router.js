@@ -45,19 +45,14 @@ chart2.get('/chart2', async (req, res) => {
             data2.push({ month: monthName, amount: totalTenderValue });
         }
 
-        // Format totalAmountCurrentYear as currency
-        const formattedTotalAmountCurrentYear = totalAmountCurrentYear.toLocaleString('en-US', { 
-            style: 'currency', 
-            currency: 'MYR',
-            minimumFractionDigits: 2 
-        });
+
 
         // Send the JSON response
         res.json({
             success: true,
             data: data2,
             totalProjectsCurrentYear,
-            totalAmountCurrentYear: formattedTotalAmountCurrentYear,
+            totalAmountCurrentYear: totalAmountCurrentYear,
         });
 
     } catch (error) {

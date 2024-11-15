@@ -65,10 +65,11 @@ userRouter.post('/login', async (req, res) => {
             {
                 userId: user.user_id,
                 profileId: user.id_profile,
-                name: user.profile.fullname,
+                name: user.profile.fullname, 
+                gender: user.profile.gender, 
             },
             process.env.JWT_SECRET,
-            { expiresIn: '1m' }
+            // { expiresIn: '1m' }
         );
 
         return res.status(200).json({
@@ -96,7 +97,7 @@ userRouter.get('/token', async (req, res) => {
     
     const token = authHeader.split(" ")[1];
     try {
-        const { userId, name, profileId } = jwt.verify(token, process.env.JWT_SECRET);
+        const { userId, name, profileId, gender } = jwt.verify(token, process.env.JWT_SECRET);
         const user = await prisma.adm_user.findUnique({
             where: { user_id: userId }
         });
@@ -106,7 +107,8 @@ userRouter.get('/token', async (req, res) => {
             success: true,
             user,
             name,
-            profileId
+            profileId,
+            gender
         });
     } catch (err) {
         console.error(err);

@@ -4,6 +4,7 @@ import _ from "lodash";
 import styles from "./Table.style";
 import Feather from "@expo/vector-icons/Feather";
 import { ScrollView } from "react-native-gesture-handler";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 function TableDashboard({ data, totalSubmission, totalCost }) {
   const columns = useMemo(
@@ -121,11 +122,17 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
 
         {/* Navigation Header */}
         <View style={styles.navigationContainer}>
-          <TouchableOpacity onPress={() => handleNavigate("left")}>
-            <Feather name="arrow-left-circle" size={30} color="black" />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleNavigate("left")}
+          >
+            <Feather name="chevron-left" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleNavigate("right")}>
-            <Feather name="arrow-right-circle" size={30} color="black" />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleNavigate("right")}
+          >
+            <Feather name="chevron-right" size={24} color="black" />
           </TouchableOpacity>
         </View>
       </View>
@@ -138,7 +145,7 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {/* Table Header */}
         {renderTableHeader()}
-  
+
         {/* Render Data Rows */}
         {paginatedData.map((item, index) => (
           <View key={index}>
@@ -149,26 +156,26 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
                   ? `${item.name.substring(0, 17)}...`
                   : item.name}
               </Text>
-  
+
               {/* Dynamic Column for Cost/Tender */}
               <Text style={styles.columnRowTxt}>
                 {currentColumn === "Total Value Cost (RM)"
                   ? item.costValue
                   : item.tenderNo}
               </Text>
-  
+
               {/* Button to Toggle Dropdown */}
               <View style={styles.navigationContainerChild}>
                 <TouchableOpacity onPress={() => toggleDropdown(index)}>
                   <Feather
                     name={expandedRow === index ? "eye-off" : "eye"}
                     size={24}
-                    color="black"
+                    color="#807A7A"
                   />
                 </TouchableOpacity>
               </View>
             </View>
-  
+
             {/* Dropdown Content */}
             {expandedRow === index && (
               <View style={styles.dropdownContainer}>
@@ -188,7 +195,7 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
             )}
           </View>
         ))}
-  
+
         {/* Pagination Controls Below the Table */}
         {tableData.length > itemsPerPage && (
           <View style={styles.paginationContainer}>
@@ -211,7 +218,7 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
             </TouchableOpacity>
           </View>
         )}
-  
+
         {/* Total Submission and Total Cost */}
         {totalSubmission && totalCost ? (
           <View style={styles.dropdownContainer}>
@@ -228,7 +235,6 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
       </ScrollView>
     </View>
   );
-  
 }
 
 export default TableDashboard;

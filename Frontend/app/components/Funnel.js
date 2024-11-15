@@ -3,7 +3,13 @@ import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Dim
 import Svg, { Polygon } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { API_URL } from "../../env";
-
+const formatCurrency = (num) => {
+  return new Intl.NumberFormat("en-MY", {
+    style: "currency",
+    currency: "MYR",
+    minimumFractionDigits: 2,
+  }).format(num);
+};
 const FunnelChart = ({year}) => {
   console.log(year)
   const [funnelData, setFunnelData] = useState([]);
@@ -15,6 +21,7 @@ const FunnelChart = ({year}) => {
       const data = await response.json();
       const formattedData = data.dataPoints.map(item => ({
         label: item.label,
+        Total_Value: item.Total_Value,
         percentage: parseFloat(item.percentage),
         color: getColorByLabel(item.label),
       }));
@@ -43,18 +50,14 @@ const FunnelChart = ({year}) => {
 
   const handleStagePress = (stage) => {
     // Assuming tender value can be calculated by a function or from the data itself
-    const tenderValue = calculateTotalTenderValue();
     Alert.alert(
       stage.label,
-      `Percentage: ${stage.percentage}%\nTotal Tender Value: ${tenderValue}`,
+      `Percentage: ${stage.percentage}%\nTotal Tender Value: ${formatCurrency(parseFloat(stage.Total_Value))}`,
       [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
     );
   };
 
-  const calculateTotalTenderValue = () => {
-    // Placeholder for tender value calculation
-    return funnelData.reduce((total, item) => total + (item.percentage || 0), 0);
-  };
+
 
   const baseHeight = 500;
   const containerHeight = 0.6 * baseHeight;

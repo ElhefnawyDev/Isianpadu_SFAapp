@@ -138,4 +138,13 @@ export default StyleSheet.create({
     color: '#333',
     marginHorizontal: 10,
   },
+  button: {
+    width: 30,
+    height: 30,
+    borderRadius: 25, // This makes it circular
+    backgroundColor: '#F2F2F2', // Light gray background
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight:5,
+  },
 });
