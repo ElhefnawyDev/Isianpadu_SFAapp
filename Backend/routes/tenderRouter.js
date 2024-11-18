@@ -43,6 +43,7 @@ tenderRouter.get("/sfa_tender", async (req, res) => {
             created_by: false,
             delete_id: true,
             deleted_by: true,
+            loa_date: true,
         }
       });
       console.log(tenders);

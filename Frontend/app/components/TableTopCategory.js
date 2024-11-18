@@ -51,6 +51,10 @@ export default function TableTopCategory({ year }) {
         data={data}
         totalSubmission={totalSubmission}
         totalCost={totalCost}
+        column={[
+          "Total Value Cost (RM)",
+          "Total Number of Tender",
+        ]}
       />
     </View>
   );

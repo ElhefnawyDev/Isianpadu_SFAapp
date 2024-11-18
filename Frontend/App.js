@@ -66,7 +66,7 @@ function AppNavigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {token ? (
+        {!token ? (
           <Stack.Screen name="Main">
             {() => (
               <Drawer.Navigator

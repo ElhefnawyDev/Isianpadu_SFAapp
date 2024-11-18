@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 40, // Adjust for spacing at the top
+    paddingBottom:10
   },
   rowContainer: {
     flexDirection: "row",

@@ -18,11 +18,13 @@ export default function TableTopProspectCategory({ year }) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
 
-        const { categoryProspectData, totalCategoryProspectCount, totalCost } = await res.json();
+        const { categoryProspectData, totalCategoryProspectCount, totalCost } =
+          await res.json();
 
         // Calculate totalCost from data if needed
         const sumCost = categoryProspectData.reduce(
-          (acc, curr) => acc + parseFloat(curr.total_tender_cost), 0
+          (acc, curr) => acc + parseFloat(curr.total_tender_cost),
+          0
         );
 
         // Format data for TableDashboard
@@ -35,7 +37,6 @@ export default function TableTopProspectCategory({ year }) {
         setData(formattedData);
         setTotalSubmission(totalCategoryProspectCount); // set totalSubmission
         setTotalCost(formatCurrency(sumCost)); // format and set totalCost
-
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -46,7 +47,12 @@ export default function TableTopProspectCategory({ year }) {
 
   return (
     <View style={{ flex: 1 }}>
-      <TableDashboard data={data} totalSubmission={totalSubmission} totalCost={totalCost} />
+      <TableDashboard
+        data={data}
+        totalSubmission={totalSubmission}
+        totalCost={totalCost}
+        column={["Total Value Cost (RM)", "Total Number of Tender"]}
+      />
     </View>
   );
 }

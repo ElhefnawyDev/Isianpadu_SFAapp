@@ -22,7 +22,8 @@ export default function TableTopWonCategory({ year }) {
 
         // Calculate totalCost from data if needed
         const sumCost = categoryWonData.reduce(
-          (acc, curr) => acc + parseFloat(curr.total_tender_value), 0
+          (acc, curr) => acc + parseFloat(curr.total_tender_value),
+          0
         );
 
         // Format data for TableDashboard
@@ -35,7 +36,6 @@ export default function TableTopWonCategory({ year }) {
         setData(formattedData);
         setTotalSubmission(totalWonCount); // set totalSubmission
         setTotalCost(formatCurrency(sumCost)); // format and set totalCost
-
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -46,8 +46,13 @@ export default function TableTopWonCategory({ year }) {
 
   return (
     <View style={{ flex: 1 }}>
-      <TableDashboard data={data} totalSubmission={totalSubmission} totalCost={totalCost} />
-      </View>
+      <TableDashboard
+        data={data}
+        totalSubmission={totalSubmission}
+        totalCost={totalCost}
+        column={["Total Value Cost (RM)", "Total Number of Tender"]}
+      />
+    </View>
   );
 }
 

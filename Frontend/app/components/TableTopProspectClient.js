@@ -15,11 +15,11 @@ export default function TableTopProspectClients({ year }) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
 
-        const { topClientProspect  } = await res.json();
-        console.log("Top 20:", topClientProspect ); // Log the fetched data
+        const { topClientProspect } = await res.json();
+        console.log("Top 20:", topClientProspect); // Log the fetched data
 
         // Format and structure data for TableDashboard
-        const formattedData = topClientProspect .map((client) => ({
+        const formattedData = topClientProspect.map((client) => ({
           name: client.client_name,
           tenderNo: parseInt(client.tender_count, 10),
           costValue: formatCurrency(parseFloat(client.total_tender_cost)),
@@ -37,7 +37,10 @@ export default function TableTopProspectClients({ year }) {
 
   return (
     <View style={{ flex: 1 }}>
-      <TableDashboard data={data} />
+      <TableDashboard
+        data={data}
+        column={["Total Value Cost (RM)", "Total Number of Tender"]}
+      />
     </View>
   );
 }

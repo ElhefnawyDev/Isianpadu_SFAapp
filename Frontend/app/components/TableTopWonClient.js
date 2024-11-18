@@ -37,7 +37,10 @@ export default function TableTopWonClient({ year }) {
 
   return (
     <View style={{ flex: 1 }}>
-      <TableDashboard data={data} />
+      <TableDashboard
+        data={data}
+        column={["Total Value Cost (RM)", "Total Number of Tender"]}
+      />
     </View>
   );
 }

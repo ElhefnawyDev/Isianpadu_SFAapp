@@ -1,25 +1,18 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { View, TouchableOpacity, FlatList, Text } from "react-native";
+import { View, TouchableOpacity, Text, ScrollView } from "react-native";
 import _ from "lodash";
 import styles from "./Table.style";
 import Feather from "@expo/vector-icons/Feather";
-import { ScrollView } from "react-native-gesture-handler";
-import AntDesign from "@expo/vector-icons/AntDesign";
 
-function TableDashboard({ data, totalSubmission, totalCost }) {
-  const columns = useMemo(
-    () => ["Total Value Cost (RM)", "Total Number of Tender"],
-    []
-  );
-
-  const fixedColumn = useMemo(() => ["Client Name"], []);
+function TableDashboard({ data, totalSubmission, totalCost, column }) {
+  const columns = useMemo(() => column || [], [column]);
   const [direction, setDirection] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState(null);
   const [tableData, setTableData] = useState([]);
-  const [currentColumn, setCurrentColumn] = useState(columns[0]);
-  const [expandedRow, setExpandedRow] = useState(null); // State to track expanded row
-  const [page, setPage] = useState(1); // Track the current page
-  const itemsPerPage = 5; // Number of items to display per page
+  const [currentColumn, setCurrentColumn] = useState(columns[0] || ""); // Default to the first column
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     setTableData(data);
@@ -29,7 +22,6 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
     (column) => {
       let newDirection;
 
-      // Toggle through three states: 'desc', 'asc', 'none'
       if (direction === "desc") {
         newDirection = "asc";
       } else if (direction === "asc") {
@@ -43,14 +35,12 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
         [
           (item) => {
             if (column === "Client Name") {
-              return item.name.toLowerCase(); // Alphabetical sorting
+              return item.name.toLowerCase();
             }
-            return column === "Total Value Cost (RM)"
-              ? parseFloat(item.costValue) // Numeric sorting
-              : parseInt(item.tenderNo); // Numeric sorting
+            return parseFloat(item[column]) || 0; // Dynamically access column data
           },
         ],
-        [newDirection === "none" ? undefined : newDirection] // Ensure sorting only if it's not 'none'
+        [newDirection === "none" ? undefined : newDirection]
       );
 
       setSelectedColumn(column);
@@ -59,8 +49,6 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
     },
     [direction, tableData]
   );
-
-  const arrowRotation = useMemo(() => ({}), [direction]);
 
   const handleNavigate = (direction) => {
     const currentIndex = columns.indexOf(currentColumn);
@@ -74,7 +62,6 @@ function TableDashboard({ data, totalSubmission, totalCost }) {
     setExpandedRow(expandedRow === index ? null : index);
   };
 
-  // Pagination Logic
   const startIndex = (page - 1) * itemsPerPage;
   const paginatedData = tableData.slice(startIndex, startIndex + itemsPerPage);
 
