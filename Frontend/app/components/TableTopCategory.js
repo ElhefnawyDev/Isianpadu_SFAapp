@@ -3,10 +3,11 @@ import { View } from "react-native";
 import TableDashboard from "./TableDashboard";
 import { API_URL } from "../../env";
 
-export default function TableTopCategory({ year }) {
+export default function TableTopCategory({ year,searchQuery }) {
   const [data, setData] = useState([]);
   const [totalSubmission, setTotalSubmission] = useState(0);
   const [totalCost, setTotalCost] = useState("0");
+  const [filteredData, setFilteredData] = useState([]); // Filtered data for the table
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +36,8 @@ export default function TableTopCategory({ year }) {
         }));
 
         setData(formattedData);
+        setFilteredData(formattedData); // Set both data and filteredData initially
+
         setTotalSubmission(totalSubmission); // Set totalSubmission as received
         setTotalCost(formatCurrency(sumCost)); // Format the calculated total cost
       } catch (error) {
@@ -45,10 +48,25 @@ export default function TableTopCategory({ year }) {
     fetchData();
   }, [year]);
 
+    // Filter data based on the search query
+    useEffect(() => {
+      if (searchQuery.trim() === "") {
+        setFilteredData(data); // If search query is empty, show all data
+      } else {
+        const query = searchQuery.toLowerCase();
+        setFilteredData(
+          data.filter((item) =>
+            Object.values(item).some((value) =>
+              String(value).toLowerCase().includes(query)
+            )
+          )
+        );
+      }
+    }, [searchQuery, data]);
   return (
     <View style={{ flex: 1 }}>
       <TableDashboard
-        data={data}
+        data={filteredData}
         totalSubmission={totalSubmission}
         totalCost={totalCost}
         column={[

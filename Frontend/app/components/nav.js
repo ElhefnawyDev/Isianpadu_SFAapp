@@ -18,11 +18,18 @@ import TableTopCategory from "./TableTopCategory";
 import TableTopWonCategory from "./TableTopWonCategory";
 import TableTopProspectCategory from "./TableTopProspectCategory";
 import Calendar from "../screens/calenderr";
+import TableIconsDash from "./TableIconsDash";
 
 const screenWidth = Dimensions.get("window").width;
 
-const Nav = ({selectedYear}) => {
+const Nav = ({ selectedYear }) => {
   const [selectedView, setSelectedView] = useState("viw1"); // Set "viw1" as the default view
+  const [searchQuery, setSearchQuery] = useState(""); // Shared search state
+  const [searchQuery2, setSearchQuery2] = useState(""); // Shared search state
+  const [searchQuery3, setSearchQuery3] = useState(""); // Shared search state
+  const [searchQuery4, setSearchQuery4] = useState(""); // Shared search state
+  const [searchQuery5, setSearchQuery5] = useState(""); // Shared search state
+  const [searchQuery6, setSearchQuery6] = useState(""); // Shared search state
 
   const handlePressViw1 = () => setSelectedView("viw1");
   const handlePressViw2 = () => setSelectedView("viw2");
@@ -35,24 +42,69 @@ const Nav = ({selectedYear}) => {
           <View>
             <ProgressCards year={selectedYear} />
             <Text style={styles.headerText}>Charts</Text>
-            <ChartsScreen selectedYear={selectedYear}/>
+            <ChartsScreen selectedYear={selectedYear} />
           </View>
         );
       case "viw2":
         return (
           <View>
             <Text style={styles.headerText}>Top 20 Clients</Text>
-            <TableTop20Clients year={selectedYear} />
+            <TableIconsDash
+              year={selectedYear}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              tableNo={1}
+            />
+            <TableTop20Clients year={selectedYear} searchQuery={searchQuery} />
             <Text style={styles.headerText}>Top Client (Won)</Text>
-            <TableTopWonClient year={selectedYear} />
+            <TableIconsDash
+              year={selectedYear}
+              searchQuery={searchQuery2}
+              setSearchQuery={setSearchQuery2}
+              tableNo={2}
+            />
+            <TableTopWonClient year={selectedYear} searchQuery={searchQuery2} />
             <Text style={styles.headerText}>Top Client (Prospect)</Text>
-            <TableTopProspectClients year={selectedYear} />
+            <TableIconsDash
+              year={selectedYear}
+              searchQuery={searchQuery3}
+              setSearchQuery={setSearchQuery3}
+              tableNo={3}
+            />
+            <TableTopProspectClients
+              year={selectedYear}
+              searchQuery={searchQuery3}
+            />
             <Text style={styles.headerText}>Top Category</Text>
-            <TableTopCategory year={selectedYear} />
+            <TableIconsDash
+              year={selectedYear}
+              searchQuery={searchQuery4}
+              setSearchQuery={setSearchQuery4}
+              tableNo={4}
+            />
+            <TableTopCategory year={selectedYear} searchQuery={searchQuery4} />
             <Text style={styles.headerText}>Top Category (Prospect)</Text>
-            <TableTopProspectCategory year={selectedYear} />
+            <TableIconsDash
+              year={selectedYear}
+              searchQuery={searchQuery5}
+              setSearchQuery={setSearchQuery5}
+              tableNo={5}
+            />
+            <TableTopProspectCategory
+              year={selectedYear}
+              searchQuery={searchQuery5}
+            />
             <Text style={styles.headerText}>Top Category (Won)</Text>
-            <TableTopWonCategory year={selectedYear} />
+            <TableIconsDash
+              year={selectedYear}
+              searchQuery={searchQuery6}
+              setSearchQuery={setSearchQuery6}
+              tableNo={6}
+            />
+            <TableTopWonCategory
+              year={selectedYear}
+              searchQuery={searchQuery6}
+            />
           </View>
         );
       case "viw3":
@@ -235,7 +287,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20, // Space below the header
   },
-  
 });
 
 export default Nav;

@@ -41,9 +41,12 @@ function TableTenderStage({ columns, data, itemsPerPage = 5 }) {
   );
 
   const handleNavigate = (direction) => {
-    const currentIndex = columns.findIndex((col) => col.displayName === currentColumn);
+    const currentIndex = columns.findIndex(
+      (col) => col.displayName === currentColumn
+    );
     const newIndex =
-      (currentIndex + (direction === "left" ? -1 : 1) + columns.length) % columns.length;
+      (currentIndex + (direction === "left" ? -1 : 1) + columns.length) %
+      columns.length;
     setCurrentColumn(columns[newIndex].displayName);
   };
 
@@ -64,7 +67,9 @@ function TableTenderStage({ columns, data, itemsPerPage = 5 }) {
       <View style={styles.tableHeader}>
         <TouchableOpacity onPress={() => sortTable("Client")}>
           <View>
-            <Text style={[styles.columnHeaderName, { fontWeight: "bold" }]}>Tender Name</Text>
+            <Text style={[styles.columnHeaderName, { fontWeight: "bold" }]}>
+              Tender Name
+            </Text>
             {selectedColumn === "Client" && direction !== "none" && (
               <Feather
                 name={direction === "desc" ? "arrow-down" : "arrow-up"}
@@ -111,55 +116,60 @@ function TableTenderStage({ columns, data, itemsPerPage = 5 }) {
 
   return (
     <View style={styles.container}>
-        {renderTableHeader()}
+      {renderTableHeader()}
 
-        {paginatedData.map((item, index) => (
-          <View key={index}>
-            <View style={styles.rowContainer}>
-              <Text style={styles.columnRowTxtName}>
-                {item.tenderShortname.length > 17 ? `${item.tenderShortname.substring(0, 17)}...` : item.tenderShortname}
-              </Text>
+      {paginatedData.map((item, index) => (
+        <View key={index}>
+          <View style={styles.rowContainer}>
+            <Text style={styles.columnRowTxtName}>
+              {item.tenderShortname.length > 17
+                ? `${item.tenderShortname.substring(0, 17)}...`
+                : item.tenderShortname}
+            </Text>
 
-              <Text style={styles.columnRowTxt}>
-                {columnKeyMap[currentColumn] && item[columnKeyMap[currentColumn]] !== undefined
-                  ? item[columnKeyMap[currentColumn]]
-                  : "N/A"}
-              </Text>
+            <Text style={styles.columnRowTxt}>
+              {columnKeyMap[currentColumn] &&
+              item[columnKeyMap[currentColumn]] !== undefined
+                ? item[columnKeyMap[currentColumn]]
+                : "N/A"}
+            </Text>
 
-              <View style={styles.navigationContainerChild}>
-                <TouchableOpacity onPress={() => toggleDropdown(index)}>
-                  <Feather
-                    name={expandedRow === index ? "eye-off" : "eye"}
-                    size={24}
-                    color="#807A7A"
-                  />
-                </TouchableOpacity>
-              </View>
+            <View style={styles.navigationContainerChild}>
+              <TouchableOpacity onPress={() => toggleDropdown(index)}>
+                <Feather
+                  name={expandedRow === index ? "eye-off" : "eye"}
+                  size={24}
+                  color="#807A7A"
+                />
+              </TouchableOpacity>
             </View>
-
-            {expandedRow === index && (
-              <View style={styles.dropdownContainer}>
-                {columns.map((col, colIndex) => (
-                  <View key={colIndex} style={styles.dropdownRow}>
-                    <Text style={styles.dropdownText}>
-                      {col.displayName}: {item[col.dataKey] || "N/A"}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
           </View>
-        ))}
 
-        <View style={styles.paginationContainer}>
-          <TouchableOpacity onPress={() => handlePageChange(page - 1)}>
-            <Feather name="chevron-left" size={24} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.pageNumber}>Page {page}</Text>
-          <TouchableOpacity onPress={() => handlePageChange(page + 1)}>
-            <Feather name="chevron-right" size={24} color="black" />
-          </TouchableOpacity>
+          {expandedRow === index && (
+            <View style={styles.dropdownContainer}>
+              {columns.map((col, colIndex) => (
+                <View key={colIndex} style={styles.dropdownRow}>
+                  <Text style={styles.dropdownText}>
+                    {col.displayName}: {item[col.dataKey] || "N/A"}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
+      ))}
+
+      <View style={styles.paginationContainer}>
+        <TouchableOpacity onPress={() => handlePageChange(page - 1)} disabled={page === 1}>
+          <Text style={styles.pageButtonText}>Previous</Text>
+        </TouchableOpacity>
+        <Text style={styles.pageText}>
+          Page {page} of {Math.ceil(data.length / itemsPerPage)}
+        </Text>
+        <TouchableOpacity  onPress={() => handlePageChange(page + 1)}disabled={page === Math.ceil(data.length / itemsPerPage)}>
+        <Text style={styles.pageButtonText}>Next</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

@@ -3,8 +3,10 @@ import { View } from "react-native";
 import TableDashboard from "./TableDashboard";
 import { API_URL } from "../../env";
 
-export default function TableTopWonClient({ year }) {
+export default function TableTopWonClient({ year, searchQuery }) {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); // Filtered data for the table
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,8 +27,9 @@ export default function TableTopWonClient({ year }) {
           costValue: formatCurrency(parseFloat(client.total_tender_cost)),
         }));
 
-        console.log("Formatted Data:", formattedData); // Log the formatted data
         setData(formattedData);
+        setFilteredData(formattedData); // Set both data and filteredData initially
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -35,10 +38,27 @@ export default function TableTopWonClient({ year }) {
     fetchData();
   }, [year]);
 
+    // Filter data based on the search query
+    useEffect(() => {
+      if (searchQuery.trim() === "") {
+        setFilteredData(data); // If search query is empty, show all data
+      } else {
+        const query = searchQuery.toLowerCase();
+        setFilteredData(
+          data.filter((item) =>
+            Object.values(item).some((value) =>
+              String(value).toLowerCase().includes(query)
+            )
+          )
+        );
+      }
+    }, [searchQuery, data]);
+
+
   return (
     <View style={{ flex: 1 }}>
       <TableDashboard
-        data={data}
+        data={filteredData}
         column={["Total Value Cost (RM)", "Total Number of Tender"]}
       />
     </View>
