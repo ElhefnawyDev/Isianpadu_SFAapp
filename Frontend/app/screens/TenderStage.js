@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { ScrollView, View, StyleSheet, Dimensions  } from "react-native";
-import TenderStageTable  from "../components/TenderStageTables/TenderStageTable";
+import { ScrollView, View, StyleSheet, Dimensions } from "react-native";
+import TenderStageTable from "../components/TenderStageTables/TenderStageTable";
 import { LinearGradient } from "expo-linear-gradient";
 import TableIcons from "../components/TableIcons";
 import StageSelector from "../components/TenderStageTables/TenderStageDropdown";
@@ -8,6 +8,7 @@ import StageSelector from "../components/TenderStageTables/TenderStageDropdown";
 const screenHeight = Dimensions.get("window").height;
 
 export default function TenderStageScreen() {
+  const [searchQuery, setSearchQuery] = useState(""); // Shared search state
   const [selectedStage, setSelectedStage] = useState("Prospect"); // Default selected stage
   const stageMapping = {
     Prospect: 1,
@@ -40,17 +41,16 @@ export default function TenderStageScreen() {
             initialStage={selectedStage}
             onStageSelect={handleStageSelect}
           />
-
           {/* Table Icons */}
-          <TableIcons />
+          <TableIcons selectedStage={stageNumber} searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
         </View>
       </View>
 
       {/* Solid color for the bottom half */}
       <View style={styles.solidBackground}>
-        <ScrollView contentContainerStyle={styles.contentContainer}>
+        <ScrollView contentContainerStyle={styles.contentContainer} >
           {/* Tender Stage Table */}
-          <TenderStageTable selectedStage={stageNumber} />
+          <TenderStageTable searchQuery={searchQuery} selectedStage={stageNumber} />
         </ScrollView>
       </View>
     </View>

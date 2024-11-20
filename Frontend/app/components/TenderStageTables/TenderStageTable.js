@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator, Text } from "react-native";
+import { View, ActivityIndicator, Text, TextInput } from "react-native";
 import TableTenderStage from "./TableTenderStage";
 import { API_URL } from "../../../env";
 
-export default function TableStageTable({ selectedStage }) {
+export default function TableStageTable({ selectedStage, searchQuery }) {
   const [data, setData] = useState([]); // Data for the table
+  const [filteredData, setFilteredData] = useState([]); // Filtered data for the table
   const [loading, setLoading] = useState(true); // Loading indicator
   const [error, setError] = useState(null); // Error handling state
 
@@ -75,6 +76,7 @@ export default function TableStageTable({ selectedStage }) {
           });
 
           setData(processedData);
+          setFilteredData(processedData); // Set both data and filteredData initially
           setColumns(columnsMapping[selectedStage] || columnsMapping[1]); // Update columns based on stage
         } else {
           throw new Error("Unexpected API response format.");
@@ -90,6 +92,22 @@ export default function TableStageTable({ selectedStage }) {
     fetchTableData();
   }, [selectedStage]); // Re-fetch when the selected stage changes
 
+  // Filter data based on the search query
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredData(data); // If search query is empty, show all data
+    } else {
+      const query = searchQuery.toLowerCase();
+      setFilteredData(
+        data.filter((item) =>
+          Object.values(item).some((value) =>
+            String(value).toLowerCase().includes(query)
+          )
+        )
+      );
+    }
+  }, [searchQuery, data]);
+
   // Render loading, error, or the table
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -102,9 +120,11 @@ export default function TableStageTable({ selectedStage }) {
   return (
     <View>
       <Text></Text>
-      <TableTenderStage columns={columns} data={data} itemsPerPage={5} />
+      {/* Remove or replace the empty Text */}
+      <TableTenderStage columns={columns} data={filteredData} itemsPerPage={5} />
     </View>
   );
+  
 }
 
 // Currency formatter
