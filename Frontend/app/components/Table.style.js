@@ -147,4 +147,15 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginRight:5,
   },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  noDataText: {
+    fontSize: 16,
+    color: "#999",
+    textAlign: "center",
+  },
 });

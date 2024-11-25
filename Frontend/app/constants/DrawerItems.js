@@ -2,13 +2,18 @@ export default [
 
     {
         name:'TenderStage',
-        iconType:'Feather',
-        iconName:'file'
+        iconType:'Material',
+        iconName:'briefcase'
     },
     {
         name:'Notice Board',
         iconType:'Material',
-        iconName:'message'
+        iconName:'tag'
+    },
+    {
+        name:'ChatBot',
+        iconType:'Ionicons',
+        iconName:'chatbubbles'
     },
 
  ]

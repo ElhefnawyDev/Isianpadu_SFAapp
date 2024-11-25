@@ -66,6 +66,7 @@ export default function TableTopCategory({ year,searchQuery }) {
   return (
     <View style={{ flex: 1 }}>
       <TableDashboard
+      type={2}
         data={filteredData}
         totalSubmission={totalSubmission}
         totalCost={totalCost}

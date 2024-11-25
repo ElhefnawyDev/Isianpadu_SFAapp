@@ -13,6 +13,7 @@ import {
   MaterialCommunityIcons,
   Feather,
   FontAwesome5,
+  Ionicons
 } from "@expo/vector-icons";
 import DashboardScreen from "./app/screens/Dashboard";
 import TenderStageScreen from "./app/screens/TenderStage";
@@ -21,6 +22,9 @@ import SavedScreen from "./app/screens/Saved";
 import Login from "./app/screens/login";
 import DrawerItems from "./app/constants/DrawerItems";
 import { useNavigation } from "@react-navigation/native"; // Import useNavigation
+import FloatableButtonScreen from "./app/components/FloatingButton";
+import ChatScreen from "./app/screens/chat";
+import ChatBot from "./app/screens/ChartsScreen";
 
 const maleProfileImage = require("./app/assets/navbar-logo.png"); // Replace with your image path
 const femaleProfileImage = require("./app/assets/UserFemale.png"); // Replace with your image path
@@ -45,9 +49,13 @@ function CustomDrawerContent(props) {
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.header}>
-      <Image source={profileImage} style={styles.profileImage} />
-      <Text style={styles.headerText}>
-          Hi <Text style={styles.headerNameText}>{userInfo ? userInfo.name : "Admin"}</Text> {/* Fallback to "Admin" if name is not available */}
+        <Image source={profileImage} style={styles.profileImage} />
+        <Text style={styles.headerText}>
+          Hi{" "}
+          <Text style={styles.headerNameText}>
+            {userInfo ? userInfo.name : "Admin"}
+          </Text>{" "}
+          {/* Fallback to "Admin" if name is not available */}
         </Text>
       </View>
       <DrawerItemList {...props} />
@@ -57,7 +65,7 @@ function CustomDrawerContent(props) {
 
 function AppNavigation() {
   const { token, removeToken } = useContext(AuthContext);
-  
+
   // Logout function
   const handleLogout = () => {
     removeToken(); // Remove the token and reset the auth state
@@ -66,7 +74,7 @@ function AppNavigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!token ? (
+        {token ? (
           <Stack.Screen name="Main">
             {() => (
               <Drawer.Navigator
@@ -118,6 +126,8 @@ function AppNavigation() {
                           return TenderStageScreen;
                         case "Notice Board":
                           return NoticeBoardScreen;
+                        case "ChatBot":
+                          return ChatScreen;                         
                         default:
                           return DashboardScreen; // Default fallback screen
                       }
@@ -136,8 +146,14 @@ function AppNavigation() {
                             size={24}
                             color={focused ? "#3953cd" : "black"}
                           />
-                        ) : (
+                        ) : drawer.iconType === "FontAwesome5" ? (
                           <FontAwesome5
+                            name={drawer.iconName}
+                            size={24}
+                            color={focused ? "#3953cd" : "black"}
+                          />
+                        ): (
+                          <Ionicons
                             name={drawer.iconName}
                             size={24}
                             color={focused ? "#3953cd" : "black"}
@@ -181,6 +197,8 @@ function DashboardScreenWithLogout({ navigation }) {
 const App = () => {
   return (
     <AuthProvider>
+      {/* <FloatableButtonScreen></FloatableButtonScreen> */}
+
       <AppNavigation />
     </AuthProvider>
   );

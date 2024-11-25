@@ -5,7 +5,7 @@ const tenderStageTable = express.Router();
 tenderStageTable.use(express.json());
 const prisma = new PrismaClient();
 
-tenderStageTable.get('/tender_stages', async (req, res) => {
+tenderStageTable.get("/tender_stages", async (req, res) => {
   try {
     const { sfaStage } = req.query;
     if (!sfaStage) {
@@ -20,7 +20,7 @@ tenderStageTable.get('/tender_stages', async (req, res) => {
         id_sfa_stages: parseInt(sfaStage),
       },
       orderBy: {
-        deadline: 'desc',
+        deadline: "desc",
       },
     });
 
@@ -35,8 +35,8 @@ tenderStageTable.get('/tender_stages', async (req, res) => {
       const tenderCategory = await prisma.sfa_tender_category.findUnique({
         where: { tender_category_id: tender.id_sfa_tender_category },
       });
-      const salesPerson = await prisma.adm_profile.findUnique({
-        where: { profile_id: tender.id_adm_profileSP },
+      const salesPerson = await prisma.sfa_salesteam.findUnique({
+        where: { staff_id: tender.id_adm_profileSP },
       });
 
       // Update the total tender value won
@@ -48,9 +48,15 @@ tenderStageTable.get('/tender_stages', async (req, res) => {
         clientName: client?.client_name || "Unknown Client",
         tenderCategory: tenderCategory?.tender_category || "Unknown Category",
         deadline: new Date(tender.deadline).toLocaleDateString("en-GB"),
-        tenderValue: parseFloat(tender.tender_value || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }),
-        tenderCost: parseFloat(tender.tender_cost || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }),
-        salesPerson: salesPerson?.fullname || "Not Specified",
+        tenderValue: parseFloat(tender.tender_value || 0).toLocaleString(
+          "en-US",
+          { minimumFractionDigits: 2 }
+        ),
+        tenderCost: parseFloat(tender.tender_cost || 0).toLocaleString(
+          "en-US",
+          { minimumFractionDigits: 2 }
+        ),
+        salesPerson: salesPerson?.name || "Not Specified",
         loaDate: tender.loa_date,
         status: tender.status,
         tenderShortname: tender.tender_shortname,
@@ -61,13 +67,13 @@ tenderStageTable.get('/tender_stages', async (req, res) => {
     // Send the response with the total tender value and data array
     res.json({
       data: dataArray,
-      total_tender_value_won: totalTenderValueWon.toLocaleString('en-US', {
+      total_tender_value_won: totalTenderValueWon.toLocaleString("en-US", {
         minimumFractionDigits: 2,
       }),
     });
   } catch (error) {
-    console.error('Error fetching tender data:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching tender data:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

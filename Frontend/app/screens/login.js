@@ -43,13 +43,10 @@ export default function Login() {
         style={styles.image}
       ></Image>
 
-      <Image
-        style={styles.logo}
-        source={require("../assets/logo.png")}
-      ></Image>
-      <Text style={styles.title}>Welcome Back!</Text>
+      <Image style={styles.logo} source={require("../assets/logo.png")}></Image>
+      <Text style={styles.title}>SFA SYSTEM</Text>
 
-      <Text style={styles.subtitle}>Enter Your Username & Password</Text>
+      <Text style={styles.subtitle}>SIGN IN</Text>
       <TextInput
         placeholder="Username"
         placeholderTextColor="white"

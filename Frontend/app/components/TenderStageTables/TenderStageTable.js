@@ -8,6 +8,7 @@ export default function TableStageTable({ selectedStage, searchQuery }) {
   const [filteredData, setFilteredData] = useState([]); // Filtered data for the table
   const [loading, setLoading] = useState(true); // Loading indicator
   const [error, setError] = useState(null); // Error handling state
+  const [totalTenderValueWon, setTotalTenderValueWon] = useState("0");
 
   const columnsMapping = {
     1: [
@@ -74,7 +75,8 @@ export default function TableStageTable({ selectedStage, searchQuery }) {
                 : "Please Update",
             };
           });
-
+          const totalCost = parseFloat(result.total_tender_value_won.replace(/,/g, "")) || 0;
+          setTotalTenderValueWon(totalCost);
           setData(processedData);
           setFilteredData(processedData); // Set both data and filteredData initially
           setColumns(columnsMapping[selectedStage] || columnsMapping[1]); // Update columns based on stage
@@ -121,7 +123,7 @@ export default function TableStageTable({ selectedStage, searchQuery }) {
     <View>
       <Text></Text>
       {/* Remove or replace the empty Text */}
-      <TableTenderStage columns={columns} data={filteredData} itemsPerPage={5} />
+      <TableTenderStage stage={selectedStage} columns={columns} data={filteredData} itemsPerPage={5}  totalTenderValueWon={formatCurrency(parseInt(totalTenderValueWon))}/>
     </View>
   );
   

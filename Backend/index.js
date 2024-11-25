@@ -12,6 +12,7 @@ import funnelChart from "./routes/funnelRouter.js";
 import wonIn2007To2024Router from "./routes/wonIn2007To2024Router.js";
 import eventCalendar from "./routes/events.js";
 import tenderStageTable from "./routes/TenderStageTablesRoute.js";
+import noticeRouter from "./routes/noticeBoardTable.js";
 
 const app = express();
 app.use(cors());
@@ -28,6 +29,7 @@ app.use("/api", funnelChart);
 app.use("/api", wonIn2007To2024Router);
 app.use("/api", eventCalendar);
 app.use("/api", tenderStageTable);
+app.use("/api", noticeRouter);
 
 app.listen(4000, () => {
   console.log("server is running on port 4000");

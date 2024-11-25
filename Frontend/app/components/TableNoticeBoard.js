@@ -1,19 +1,10 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { View, TouchableOpacity, Text, ScrollView } from "react-native";
 import _ from "lodash";
-import styles from "../Table.style";
+import styles from "../components/Table.style";
 import Feather from "@expo/vector-icons/Feather";
-const stages = [
-  "Prospect",
-  "Potential",
-  "Best Few",
-  "Commitment To Buy",
-  "Won",
-  "Unsuccessful",
-  "Dropped",
-];
 
-function TableTenderStage({ columns, data, itemsPerPage = 5, totalTenderValueWon, stage }) {
+function TableNoticeBoard({ columns, data, itemsPerPage = 5, totalTenderValueWon }) {
   // Map column names to keys
   const columnKeyMap = columns.reduce((map, col) => {
     map[col.displayName] = col.dataKey;
@@ -194,15 +185,8 @@ function TableTenderStage({ columns, data, itemsPerPage = 5, totalTenderValueWon
           </TouchableOpacity>
         </View>
       )}
-
-      <View style={styles.dropdownContainer}>
-        <View style={styles.detailColumn}>
-          <Text style={styles.labelText}>Total Tender Value {stages[stage-1]}:</Text>
-          <Text style={styles.valueText}>{totalTenderValueWon}</Text>
-        </View>
-      </View>
     </View>
   );
 }
 
-export default TableTenderStage;
+export default TableNoticeBoard;

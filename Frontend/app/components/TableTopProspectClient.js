@@ -60,6 +60,7 @@ export default function TableTopProspectClients({ year, searchQuery }) {
   return (
     <View style={{ flex: 1 }}>
       <TableDashboard
+      type={1}
         data={filteredData}
         column={["Total Value Cost (RM)", "Total Number of Tender"]}
       />

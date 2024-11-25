@@ -57,6 +57,7 @@ export default function TableTop20Clients({ year, searchQuery }) {
   return (
     <View style={{ flex: 1 }}>
       <TableDashboard
+      type={1}
         data={filteredData}
         column={[
           "Total Value Cost (RM)",

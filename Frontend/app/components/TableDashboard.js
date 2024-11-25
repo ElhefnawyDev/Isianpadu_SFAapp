@@ -4,7 +4,7 @@ import _ from "lodash";
 import styles from "./Table.style";
 import Feather from "@expo/vector-icons/Feather";
 
-function TableDashboard({ data, totalSubmission, totalCost, column }) {
+function TableDashboard({ data, totalSubmission, totalCost, column, type }) {
   const columns = useMemo(() => column || [], [column]);
   const [direction, setDirection] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState(null);
@@ -78,7 +78,7 @@ function TableDashboard({ data, totalSubmission, totalCost, column }) {
         <TouchableOpacity onPress={() => sortTable("Client Name")}>
           <View>
             <Text style={[styles.columnHeaderName, { fontWeight: "bold" }]}>
-              Client Name
+              {type===1 ? "Client Name:" : "Top Category:"}
             </Text>
             {selectedColumn === "Client Name" && direction !== "none" && (
               <Feather
@@ -126,63 +126,69 @@ function TableDashboard({ data, totalSubmission, totalCost, column }) {
     ),
     [currentColumn, direction, selectedColumn]
   );
-
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {/* Table Header */}
         {renderTableHeader()}
-
-        {/* Render Data Rows */}
-        {paginatedData.map((item, index) => (
-          <View key={index}>
-            <View style={styles.rowContainer}>
-              {/* Fixed Column for Client Name with truncated name */}
-              <Text style={styles.columnRowTxtName}>
-                {item.name.length > 17
-                  ? `${item.name.substring(0, 17)}...`
-                  : item.name}
-              </Text>
-
-              {/* Dynamic Column for Cost/Tender */}
-              <Text style={styles.columnRowTxt}>
-                {currentColumn === "Total Value Cost (RM)"
-                  ? item.costValue
-                  : item.tenderNo}
-              </Text>
-
-              {/* Button to Toggle Dropdown */}
-              <View style={styles.navigationContainerChild}>
-                <TouchableOpacity onPress={() => toggleDropdown(index)}>
-                  <Feather
-                    name={expandedRow === index ? "eye-off" : "eye"}
-                    size={24}
-                    color="#807A7A"
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Dropdown Content */}
-            {expandedRow === index && (
-              <View style={styles.dropdownContainer}>
-                <View style={styles.detailColumn}>
-                  <Text style={styles.labelText}>Client Name:</Text>
-                  <Text style={styles.valueText}>{item.name}</Text>
-                </View>
-                <View style={styles.detailColumn}>
-                  <Text style={styles.labelText}>Total Value Cost RM:</Text>
-                  <Text style={styles.valueText}>{item.costValue}</Text>
-                </View>
-                <View style={styles.detailColumn}>
-                  <Text style={styles.labelText}>Total Number of Tender:</Text>
-                  <Text style={styles.valueText}>{item.tenderNo}</Text>
-                </View>
-              </View>
-            )}
+  
+        {/* Check if there is no data */}
+        {tableData.length === 0 ? (
+          <View style={styles.noDataContainer}>
+            <Text style={styles.noDataText}>No available data</Text>
           </View>
-        ))}
-
+        ) : (
+          /* Render Data Rows */
+          paginatedData.map((item, index) => (
+            <View key={index}>
+              <View style={styles.rowContainer}>
+                {/* Fixed Column for Client Name with truncated name */}
+                <Text style={styles.columnRowTxtName}>
+                  {item.name.length > 17
+                    ? `${item.name.substring(0, 17)}...`
+                    : item.name}
+                </Text>
+  
+                {/* Dynamic Column for Cost/Tender */}
+                <Text style={styles.columnRowTxt}>
+                  {currentColumn === "Total Value Cost (RM)"
+                    ? item.costValue
+                    : item.tenderNo}
+                </Text>
+  
+                {/* Button to Toggle Dropdown */}
+                <View style={styles.navigationContainerChild}>
+                  <TouchableOpacity onPress={() => toggleDropdown(index)}>
+                    <Feather
+                      name={expandedRow === index ? "eye-off" : "eye"}
+                      size={24}
+                      color="#807A7A"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+  
+              {/* Dropdown Content */}
+              {expandedRow === index && (
+                <View style={styles.dropdownContainer}>
+                  <View style={styles.detailColumn}>
+                    <Text style={styles.labelText}>Client Name:</Text>
+                    <Text style={styles.valueText}>{item.name}</Text>
+                  </View>
+                  <View style={styles.detailColumn}>
+                    <Text style={styles.labelText}>Total Value Cost RM:</Text>
+                    <Text style={styles.valueText}>{item.costValue}</Text>
+                  </View>
+                  <View style={styles.detailColumn}>
+                    <Text style={styles.labelText}>Total Number of Tender:</Text>
+                    <Text style={styles.valueText}>{item.tenderNo}</Text>
+                  </View>
+                </View>
+              )}
+            </View>
+          ))
+        )}
+  
         {/* Pagination Controls Below the Table */}
         {tableData.length > itemsPerPage && (
           <View style={styles.paginationContainer}>
@@ -205,7 +211,7 @@ function TableDashboard({ data, totalSubmission, totalCost, column }) {
             </TouchableOpacity>
           </View>
         )}
-
+  
         {/* Total Submission and Total Cost */}
         {totalSubmission && totalCost ? (
           <View style={styles.dropdownContainer}>
@@ -222,6 +228,7 @@ function TableDashboard({ data, totalSubmission, totalCost, column }) {
       </ScrollView>
     </View>
   );
+  
 }
 
 export default TableDashboard;

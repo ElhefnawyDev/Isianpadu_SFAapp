@@ -10,25 +10,31 @@ const formatCurrency = (num) => {
     minimumFractionDigits: 2,
   }).format(num);
 };
-const FunnelChart = ({year}) => {
-  console.log(year)
+
+
+const FunnelChart = ({ year= 2024, setVisibility }) => {
   const [funnelData, setFunnelData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${API_URL}/funnelRouter?selected_year=${year}`);
       const data = await response.json();
-      const formattedData = data.dataPoints.map(item => ({
+
+      const formattedData = data?.dataPoints?.map((item) => ({
         label: item.label,
         Total_Value: item.Total_Value,
         percentage: parseFloat(item.percentage),
         color: getColorByLabel(item.label),
-      }));
+      })) || [];
+
       setFunnelData(formattedData);
-      setLoading(false);
+      setVisibility(formattedData.length > 0); // Update visibility dynamically
     } catch (error) {
       console.error('Error fetching data:', error);
+      setVisibility(false); // Hide funnel on error
+    } finally {
       setLoading(false);
     }
   };
@@ -49,32 +55,50 @@ const FunnelChart = ({year}) => {
   };
 
   const handleStagePress = (stage) => {
-    // Assuming tender value can be calculated by a function or from the data itself
     Alert.alert(
       stage.label,
-      `Percentage: ${stage.percentage}%\nTotal Tender Value: ${formatCurrency(parseFloat(stage.Total_Value))}`,
+      `Percentage: ${stage.percentage}%\nTotal Tender Value: ${formatCurrency(
+        parseFloat(stage.Total_Value)
+      )}`,
       [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
     );
   };
 
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
+  if (!funnelData.length) {
+    return null; // No data, return null to hide the component
+  }
 
   const baseHeight = 500;
   const containerHeight = 0.6 * baseHeight;
   const funnelWidth = 350;
 
-  const stageHeights = funnelData.map(stage => (stage.percentage / 100) * (baseHeight * 0.6));
+  const stageHeights = funnelData.map(
+    (stage) => (stage.percentage / 100) * (baseHeight * 0.6)
+  );
   let accumulatedHeight = 0;
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
+  if (funnelData.length === 0) {
+    return null; // Return null if there's no data
+  }
+
   return (
     <View style={styles.container}>
-      <View style={{ width: funnelWidth, height: containerHeight, }}>
+      <View
+        style={{
+          width: funnelWidth,
+          height: containerHeight,
+        }}
+      >
         <MaskedView
-          style={{ height: '100%', width: '100%' }}
+          style={{ height: "100%", width: "100%" }}
           maskElement={
             <Svg height={baseHeight} width={funnelWidth}>
               <Polygon
@@ -98,17 +122,23 @@ const FunnelChart = ({year}) => {
               const stageStyle = {
                 height: stageHeights[index],
                 backgroundColor: stage.color,
-                width: '100%',
-                position: 'absolute',
+                width: "100%",
+                position: "absolute",
                 top: accumulatedHeight,
-                justifyContent: 'center',
-                alignItems: 'center',
+                justifyContent: "center",
+                alignItems: "center",
                 opacity: 0.8,
               };
               accumulatedHeight += stageHeights[index];
               return (
-                <TouchableOpacity key={index} style={stageStyle} onPress={() => handleStagePress(stage)}>
-                  <Text style={styles.stageLabel}>{stage.label} ({stage.percentage}%)</Text>
+                <TouchableOpacity
+                  key={index}
+                  style={stageStyle}
+                  onPress={() => handleStagePress(stage)}
+                >
+                  <Text style={styles.stageLabel}>
+                    {stage.label} ({stage.percentage}%)
+                  </Text>
                 </TouchableOpacity>
               );
             })}
@@ -118,6 +148,7 @@ const FunnelChart = ({year}) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   stageLabel: {

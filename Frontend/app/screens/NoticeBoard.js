@@ -1,10 +1,80 @@
-import * as React from 'react';
-import { View, Text } from "react-native";
+import React, { useState } from "react";
+import { ScrollView, View, StyleSheet, Dimensions } from "react-native";
+import TenderStageTable from "../components/TenderStageTables/TenderStageTable";
+import { LinearGradient } from "expo-linear-gradient";
+import TableIcons from "../components/TableIcons";
+import StageSelector from "../components/TenderStageTables/TenderStageDropdown";
+import NoticeBoardTable from "../components/NoticeBoardTable";
+import TableIconsNoticeBoard from "../components/TableIconsNoticeBoard";
 
-export default function NoticeBoardScreen() {
-   return (
-<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-<Text style={{fontSize:16,fontWeight:'700'}}>NoticeBoard Screen</Text>
-</View>
-   );
- }
+const screenHeight = Dimensions.get("window").height;
+
+export default function TenderStageScreen() {
+  const [searchQuery, setSearchQuery] = useState(""); // Shared search state
+
+  return (
+    <View style={styles.container}>
+      {/* Gradient for the top half */}
+      <LinearGradient
+        colors={["#405de5", "#263788"]}
+        style={styles.gradientBackground}
+      />
+
+      <View style={styles.contentContainer}>
+        <View style={styles.rowContainer}>
+          <TableIconsNoticeBoard
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+        </View>
+      </View>
+
+      {/* Solid color for the bottom half */}
+      <View style={styles.solidBackground}>
+        <ScrollView contentContainerStyle={styles.contentContainer}>
+          <NoticeBoardTable searchQuery={searchQuery}></NoticeBoardTable>
+        </ScrollView>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  gradientBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: screenHeight / 2,
+    zIndex: 1,
+  },
+  solidBackground: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: "18%",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    backgroundColor: "white",
+    zIndex: 1,
+  },
+  contentContainer: {
+    alignItems: "center",
+    paddingBottom: 40,
+    zIndex: 10,
+  },
+  rowContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    width: "80%",
+    height: 90,
+    marginBottom: 50,
+    zIndex: 20,
+  },
+});
