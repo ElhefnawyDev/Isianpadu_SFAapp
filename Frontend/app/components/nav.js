@@ -30,6 +30,12 @@ const Nav = ({ selectedYear }) => {
   const [searchQuery4, setSearchQuery4] = useState(""); // Shared search state
   const [searchQuery5, setSearchQuery5] = useState(""); // Shared search state
   const [searchQuery6, setSearchQuery6] = useState(""); // Shared search state
+  const [filteredData, setFilteredData] = useState([]); // New state for filtered data
+  const [filteredData2, setFilteredData2] = useState([]); // New state for filtered data
+  const [filteredData3, setFilteredData3] = useState([]); // New state for filtered data
+  const [filteredData4, setFilteredData4] = useState([]); // New state for filtered data
+  const [filteredData5, setFilteredData5] = useState([]); // New state for filtered data
+  const [filteredData6, setFilteredData6] = useState([]); // New state for filtered data
 
   const handlePressViw1 = () => setSelectedView("viw1");
   const handlePressViw2 = () => setSelectedView("viw2");
@@ -54,26 +60,38 @@ const Nav = ({ selectedYear }) => {
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               tableNo={1}
+              filteredData={filteredData} // Pass filteredData to TableIcons
             />
-            <TableTop20Clients year={selectedYear} searchQuery={searchQuery} />
+            <TableTop20Clients
+              year={selectedYear}
+              searchQuery={searchQuery}
+              onFilteredDataChange={(data) => setFilteredData(data)} // Update filteredData state
+            />
             <Text style={styles.headerText}>Top Client (Won)</Text>
             <TableIconsDash
               year={selectedYear}
               searchQuery={searchQuery2}
               setSearchQuery={setSearchQuery2}
               tableNo={2}
+              filteredData={filteredData2} // Pass filteredData to TableIcons
             />
-            <TableTopWonClient year={selectedYear} searchQuery={searchQuery2} />
+            <TableTopWonClient
+              year={selectedYear}
+              searchQuery={searchQuery2}
+              onFilteredDataChange={(data2) => setFilteredData2(data2)} // Update filteredData state
+            />
             <Text style={styles.headerText}>Top Client (Prospect)</Text>
             <TableIconsDash
               year={selectedYear}
               searchQuery={searchQuery3}
               setSearchQuery={setSearchQuery3}
               tableNo={3}
+              filteredData={filteredData3} // Pass filteredData to TableIcons
             />
             <TableTopProspectClients
               year={selectedYear}
               searchQuery={searchQuery3}
+              onFilteredDataChange={(data) => setFilteredData3(data)} // Update filteredData state
             />
             <Text style={styles.headerText}>Top Category</Text>
             <TableIconsDash
@@ -81,18 +99,25 @@ const Nav = ({ selectedYear }) => {
               searchQuery={searchQuery4}
               setSearchQuery={setSearchQuery4}
               tableNo={4}
+              filteredData={filteredData4} // Pass filteredData to TableIcons
             />
-            <TableTopCategory year={selectedYear} searchQuery={searchQuery4} />
+            <TableTopCategory
+              year={selectedYear}
+              searchQuery={searchQuery4}
+              onFilteredDataChange={(data) => setFilteredData4(data)} // Update filteredData state
+            />
             <Text style={styles.headerText}>Top Category (Prospect)</Text>
             <TableIconsDash
               year={selectedYear}
               searchQuery={searchQuery5}
               setSearchQuery={setSearchQuery5}
               tableNo={5}
+              filteredData={filteredData5} // Pass filteredData to TableIcons
             />
             <TableTopProspectCategory
               year={selectedYear}
               searchQuery={searchQuery5}
+              onFilteredDataChange={(data) => setFilteredData5(data)} // Update filteredData state
             />
             <Text style={styles.headerText}>Top Category (Won)</Text>
             <TableIconsDash
@@ -100,10 +125,12 @@ const Nav = ({ selectedYear }) => {
               searchQuery={searchQuery6}
               setSearchQuery={setSearchQuery6}
               tableNo={6}
+              filteredData={filteredData6} // Pass filteredData to TableIcons
             />
             <TableTopWonCategory
               year={selectedYear}
               searchQuery={searchQuery6}
+              onFilteredDataChange={(data) => setFilteredData6(data)} // Update filteredData state
             />
           </View>
         );

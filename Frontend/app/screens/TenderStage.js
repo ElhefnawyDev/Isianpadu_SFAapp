@@ -10,6 +10,8 @@ const screenHeight = Dimensions.get("window").height;
 export default function TenderStageScreen() {
   const [searchQuery, setSearchQuery] = useState(""); // Shared search state
   const [selectedStage, setSelectedStage] = useState("Prospect"); // Default selected stage
+  const [filteredData, setFilteredData] = useState([]); // New state for filtered data
+
   const stageMapping = {
     Prospect: 1,
     Potential: 2,
@@ -42,15 +44,24 @@ export default function TenderStageScreen() {
             onStageSelect={handleStageSelect}
           />
           {/* Table Icons */}
-          <TableIcons selectedStage={stageNumber} searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
+          <TableIcons
+            selectedStage={stageNumber}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            filteredData={filteredData} // Pass filteredData to TableIcons
+          />
         </View>
       </View>
 
       {/* Solid color for the bottom half */}
       <View style={styles.solidBackground}>
-        <ScrollView contentContainerStyle={styles.contentContainer} >
+        <ScrollView contentContainerStyle={styles.contentContainer}>
           {/* Tender Stage Table */}
-          <TenderStageTable searchQuery={searchQuery} selectedStage={stageNumber} />
+          <TenderStageTable
+            searchQuery={searchQuery}
+            selectedStage={stageNumber}
+            onFilteredDataChange={(data) => setFilteredData(data)} // Update filteredData state
+          />
         </ScrollView>
       </View>
     </View>

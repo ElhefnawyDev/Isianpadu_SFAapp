@@ -3,7 +3,7 @@ import { View, ActivityIndicator, Text, TextInput } from "react-native";
 import TableTenderStage from "./TableTenderStage";
 import { API_URL } from "../../../env";
 
-export default function TableStageTable({ selectedStage, searchQuery }) {
+export default function TableStageTable({ selectedStage, searchQuery, onFilteredDataChange }) {
   const [data, setData] = useState([]); // Data for the table
   const [filteredData, setFilteredData] = useState([]); // Filtered data for the table
   const [loading, setLoading] = useState(true); // Loading indicator
@@ -109,6 +109,13 @@ export default function TableStageTable({ selectedStage, searchQuery }) {
       );
     }
   }, [searchQuery, data]);
+
+  // Emit filtered data to the parent component
+  useEffect(() => {
+    if (onFilteredDataChange) {
+      onFilteredDataChange(filteredData);
+    }
+  }, [filteredData, onFilteredDataChange]);
 
   // Render loading, error, or the table
   if (loading) {

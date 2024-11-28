@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { useState, useEffect, useRef, useContext } from 'react';
+import { Text, View, StyleSheet, Image, TouchableOpacity, Button, Platform  } from "react-native";
 import { AuthProvider, AuthContext } from "./AuthContext";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -25,6 +25,17 @@ import { useNavigation } from "@react-navigation/native"; // Import useNavigatio
 import FloatableButtonScreen from "./app/components/FloatingButton";
 import ChatScreen from "./app/screens/chat";
 import ChatBot from "./app/screens/ChartsScreen";
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import { API_URL } from './env';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 const maleProfileImage = require("./app/assets/navbar-logo.png"); // Replace with your image path
 const femaleProfileImage = require("./app/assets/UserFemale.png"); // Replace with your image path
@@ -32,6 +43,75 @@ const alienProfileImage = require("./app/assets/AlienUser.png"); // Replace with
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
+
+async function scheduleTenderNotification(tender) {
+  const tenderDeadline = new Date(tender.deadline);
+  const formattedDeadline = `${tenderDeadline.getDate().toString().padStart(2, "0")}/${
+    (tenderDeadline.getMonth() + 1).toString().padStart(2, "0")
+  }/${tenderDeadline.getFullYear()}`;
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Tender Deadline Alert!",
+      body: `Tender ${tender.tender_shortname} is approaching its deadline: ${formattedDeadline}`,
+      data: { tenderId: tender.tender_id },
+    },
+    trigger: { seconds: 5 }, // Adjust for testing purposes
+  });
+}
+
+async function fetchTenderData(userId) {
+  try {
+    const response = await fetch(`${API_URL}/sfa_tender`);
+    if (!response.ok) throw new Error("Failed to fetch tender data");
+
+    const tenderData = await response.json();
+    if (tenderData.success) {
+      const currentDate = new Date();
+
+      const oneMonthFromNow = new Date();
+      oneMonthFromNow.setMonth(currentDate.getMonth() + 1);
+
+      // Filter tenders first by id_adm_profileSP before further checks
+      const userTenders = tenderData.tenders.filter(
+        (tender) => tender.id_adm_profileSP === userId
+      );
+
+      // Further filter by deadline
+      const filteredTenders = userTenders.filter((tender) => {
+        const tenderDeadline =
+          tender.deadline && tender.deadline !== "null"
+            ? new Date(tender.deadline)
+            : null;
+
+        // Log details for testing
+        console.log(`Processing Tender: ${tender.tender_shortname}`);
+        console.log(`Tender Deadline: ${tenderDeadline}`);
+        console.log(`Current Date: ${currentDate}`);
+        console.log(`One Month From Now: ${oneMonthFromNow}`);
+
+        return (
+          tenderDeadline &&
+          tenderDeadline > currentDate &&
+          tenderDeadline <= oneMonthFromNow
+        );
+      });
+
+      // Debugging: Log filtered tenders for the specific user
+      console.log("Filtered Tenders:", filteredTenders);
+
+      // Schedule notifications for filtered tenders
+      filteredTenders.forEach((tender) => {
+        console.log(`Scheduling notification for tender: ${tender.tender_shortname}`);
+        scheduleTenderNotification(tender);
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching tenders:", error.message);
+  }
+}
+
+
 
 function CustomDrawerContent(props) {
   const { userInfo } = useContext(AuthContext); // Access userInfo from AuthContext
@@ -64,8 +144,22 @@ function CustomDrawerContent(props) {
 }
 
 function AppNavigation() {
-  const { token, removeToken } = useContext(AuthContext);
+  const { token, removeToken, userInfo, } = useContext(AuthContext);
+  const res = JSON.stringify(userInfo)
+  console.log("resid: "+res)
 
+  useEffect(() => {
+    if (token && userInfo) {
+      const parsedRes = JSON.parse(res); // Parse the string back into an object
+      if (parsedRes?.user?.id_profile) {
+        fetchTenderData(parsedRes.user.id_profile);
+        console.log("user id:", parsedRes.user.id_profile);
+      } else {
+        console.warn("User ID not found in response.");
+      }
+    }
+  }, [token]); // Remove userInfo as a dependency to prevent unnecessary triggers.
+  
   // Logout function
   const handleLogout = () => {
     removeToken(); // Remove the token and reset the auth state
@@ -195,6 +289,25 @@ function DashboardScreenWithLogout({ navigation }) {
 }
 
 const App = () => {
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  useEffect(() => {
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
   return (
     <AuthProvider>
       {/* <FloatableButtonScreen></FloatableButtonScreen> */}
@@ -203,7 +316,46 @@ const App = () => {
     </AuthProvider>
   );
 };
+async function schedulePushNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Tender Deadline Alert!",
+      body: `Tender ${tender.tender_shortname} is approaching its deadline: ${formattedDeadline}`,
+      data: { tenderId: tender.tender_id },
+    },
+    trigger: { seconds: 2 },
+  });
+}
 
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  }
+
+  return token;
+}
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#fff" },
   header: {

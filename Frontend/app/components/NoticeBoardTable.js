@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator, Text, TextInput } from "react-native";
+import { View, ActivityIndicator, Text } from "react-native";
 import TableTenderStage from "./TenderStageTables/TableTenderStage";
 import { API_URL } from "../../env";
 import TableNoticeBoard from "./TableNoticeBoard";
 
-export default function NoticeBoardTable({ searchQuery }) {
+export default function NoticeBoardTable({
+  searchQuery,
+  onFilteredDataChange,
+}) {
   const [data, setData] = useState([]); // Data for the table
-  const [data2, setData2] = useState([]); // Data for the table
   const [filteredData, setFilteredData] = useState([]); // Filtered data for the table
   const [error, setError] = useState(null); // Error handling state
   const [totalTenderValueWon, setTotalTenderValueWon] = useState("0");
 
   const columnsMapping = {
     1: [
-      { displayName: "Submission Method", dataKey: "subm_method" },
-      { displayName: "Submission Type", dataKey: "subm_type" },
-      { displayName: "Brief Date", dataKey: "brief_date" },
+      { displayName: "Submission Method", dataKey: "submissionMethod" },
+      { displayName: "Submission Type", dataKey: "submissionType" },
+      { displayName: "Brief Date", dataKey: "briefDate" },
       { displayName: "Deadline", dataKey: "deadline" },
-      { displayName: "Sales Person", dataKey: "name" },
-      { displayName: "Pre sales", dataKey: "status" },
-      { displayName: "Sales Admin", dataKey: "status" },
+      { displayName: "Sales Person", dataKey: "salesPerson" },
+      { displayName: "Pre-Sales", dataKey: "preSales" },
+      { displayName: "Sales Admin", dataKey: "salesAdmin" },
       { displayName: "Remarks", dataKey: "remarks" },
     ],
   };
@@ -30,21 +32,26 @@ export default function NoticeBoardTable({ searchQuery }) {
   useEffect(() => {
     const fetchNotices = async () => {
       try {
-        const response = await fetch(`${API_URL}/notices`); // Replace with your API URL
+        const response = await fetch(`${API_URL}/notices`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        console.log("Notices:", data.notices);
-        setData(data);
-        setFilteredData(data); // Set both data and filteredData initially
-
-        // Handle the fetched data here, e.g., set state
+        const result = await response.json();
+        if (result.success) {
+          setData(result.notices);
+          setFilteredData(result.notices); // Initialize filtered data with all data
+          console.log("Fetched notices:", result.notices);
+        } else {
+          throw new Error(result.message || "Failed to fetch notices.");
+        }
       } catch (error) {
         console.error("Error fetching notices:", error);
+        setError(error.message);
       }
     };
-  });
+
+    fetchNotices();
+  }, []);
 
   // Filter data based on the search query
   useEffect(() => {
@@ -61,6 +68,13 @@ export default function NoticeBoardTable({ searchQuery }) {
       );
     }
   }, [searchQuery, data]);
+
+  // Emit filtered data to the parent component
+  useEffect(() => {
+    if (onFilteredDataChange) {
+      onFilteredDataChange(filteredData);
+    }
+  }, [filteredData, onFilteredDataChange]);
 
   if (error) {
     return (

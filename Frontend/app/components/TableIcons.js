@@ -108,19 +108,14 @@ const columnsMapping = {
   ],
 };
 
-export default function TableIcons({ selectedStage, searchQuery, setSearchQuery }) {
+export default function TableIcons({ selectedStage, searchQuery, setSearchQuery, filteredData }) {
   
   const handleExportPDF = async () => {
     try {
-      // Fetch data for the current stage
-      const response = await fetch(
-        `${API_URL}/tender_stages?sfaStage=${selectedStage}`
-      );
-      const result = await response.json();
-      const data = result?.data || [];
+      const data = filteredData || []; // Use filteredData instead of fetching
 
       if (data.length === 0) {
-        alert("No data available for the selected stage!");
+        alert("No data available for the current view!");
         return;
       }
 
@@ -239,149 +234,140 @@ export default function TableIcons({ selectedStage, searchQuery, setSearchQuery 
       alert("Failed to export PDF.");
     }
   };
-  
-const handleExportCSV = async () => {
-  try {
-    // Fetch data for the current stage
-    const response = await fetch(
-      `${API_URL}/tender_stages?sfaStage=${selectedStage}`
-    );
-    const result = await response.json();
-    const data = result?.data || [];
 
-    if (data.length === 0) {
-      alert("No data available for the selected stage!");
-      return;
-    }
-
-    // Prepare data for CSV
-    const currentColumns = columnsMapping[selectedStage] || columnsMapping[1];
-
-    // Map the data rows to match the column definitions
-    const processedData = data.map((item, index) => {
-      const tenderValue = parseFloat(
-        item.tenderValue?.replace(/,/g, "") || 0
-      );
-      const tenderCost = parseFloat(item.tenderCost?.replace(/,/g, "") || 0);
-      const marginValue = currentColumns.some(
-        (col) => col.dataKey === "marginValue"
-      )
-        ? tenderValue - tenderCost
-        : null;
-      const marginPercentage = currentColumns.some(
-        (col) => col.dataKey === "marginPercentage"
-      )
-        ? tenderValue !== 0
-          ? (marginValue / tenderValue) * 100
-          : 0
-        : null;
-
-      return {
-        no: index + 1,
-        tenderShortname: item.tenderShortname || "N/A",
-        clientName: item.clientName || "N/A",
-        tenderCategory: item.tenderCategory || "N/A",
-        deadline: item.deadline || "N/A",
-        tenderValue: tenderValue.toLocaleString("en-MY", {
-          minimumFractionDigits: 2,
-        }),
-        tenderCost: tenderCost.toLocaleString("en-MY", {
-          minimumFractionDigits: 2,
-        }),
-        marginValue:
-          marginValue !== null
-            ? marginValue.toLocaleString("en-MY", {
-                style: "currency",
-                currency: "MYR",
-              })
-            : "N/A",
-        marginPercentage:
-          marginPercentage !== null
-            ? `${marginPercentage.toFixed(2)}%`
-            : "N/A",
-        loaDate: item.loaDate
-          ? new Date(item.loaDate).toLocaleDateString("en-GB")
-          : "Please Update",
-        salesPerson: item.salesPerson || "Not Specified",
-        status: item.status || "N/A",
-      };
-    });
-
-    // Convert the data to CSV
-    const csvContent = Papa.unparse({
-      fields: currentColumns.map((col) => col.displayName), // Headers
-      data: processedData.map((row) =>
-        currentColumns.map((col) => row[col.dataKey] || "N/A")
-      ), // Rows
-    });
-
-    // Save the CSV file
-    const fileUri = `${FileSystem.documentDirectory}tenders.csv`;
-    await FileSystem.writeAsStringAsync(fileUri, csvContent, {
-      encoding: FileSystem.EncodingType.UTF8,
-    });
-
-    // Share the CSV file
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(fileUri, {
-        mimeType: "text/csv",
-        dialogTitle: "Share CSV File",
-        UTI: "public.comma-separated-values-text",
-      });
-    } else {
-      alert("Sharing is not available on this device!");
-    }
-  } catch (error) {
-    console.error("Error exporting CSV:", error);
-    alert("Failed to export CSV.");
-  }
-};
-  
-  
-  const handleExportExcel = async () => {
+  const handleExportCSV = async () => {
     try {
-      // Fetch data for the current stage
-      const response = await fetch(
-        `${API_URL}/tender_stages?sfaStage=${selectedStage}`
-      );
-      const result = await response.json();
-      const data = result?.data || [];
+      const data = filteredData || []; // Use filteredData instead of fetching
 
       if (data.length === 0) {
-        alert("No data available for the selected stage!");
+        alert("No data available for the current view!");
         return;
       }
 
+      // Prepare data for CSV
+      const currentColumns = columnsMapping[selectedStage] || columnsMapping[1];
+
+      const processedData = data.map((item, index) => {
+        const tenderValue = parseFloat(
+          item.tenderValue?.replace(/,/g, "") || 0
+        );
+        const tenderCost = parseFloat(item.tenderCost?.replace(/,/g, "") || 0);
+        const marginValue = currentColumns.some(
+          (col) => col.dataKey === "marginValue"
+        )
+          ? tenderValue - tenderCost
+          : null;
+        const marginPercentage = currentColumns.some(
+          (col) => col.dataKey === "marginPercentage"
+        )
+          ? tenderValue !== 0
+            ? (marginValue / tenderValue) * 100
+            : 0
+          : null;
+
+        return {
+          no: index + 1,
+          tenderShortname: item.tenderShortname || "N/A",
+          clientName: item.clientName || "N/A",
+          tenderCategory: item.tenderCategory || "N/A",
+          deadline: item.deadline || "N/A",
+          tenderValue: tenderValue.toLocaleString("en-MY", {
+            minimumFractionDigits: 2,
+          }),
+          tenderCost: tenderCost.toLocaleString("en-MY", {
+            minimumFractionDigits: 2,
+          }),
+          marginValue:
+            marginValue !== null
+              ? marginValue.toLocaleString("en-MY", {
+                  style: "currency",
+                  currency: "MYR",
+                })
+              : "N/A",
+          marginPercentage:
+            marginPercentage !== null
+              ? `${marginPercentage.toFixed(2)}%`
+              : "N/A",
+          loaDate: item.loaDate
+            ? new Date(item.loaDate).toLocaleDateString("en-GB")
+            : "Please Update",
+          salesPerson: item.salesPerson || "Not Specified",
+          status: item.status || "N/A",
+        };
+      });
+
+      // Convert the data to CSV
+      const csvContent = Papa.unparse({
+        fields: currentColumns.map((col) => col.displayName), // Headers
+        data: processedData.map((row) =>
+          currentColumns.map((col) => row[col.dataKey] || "N/A")
+        ), // Rows
+      });
+
+      // Save the CSV file
+      const fileUri = `${FileSystem.documentDirectory}tenders.csv`;
+      await FileSystem.writeAsStringAsync(fileUri, csvContent, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      // Share the CSV file
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri, {
+          mimeType: "text/csv",
+          dialogTitle: "Share CSV File",
+          UTI: "public.comma-separated-values-text",
+        });
+      } else {
+        alert("Sharing is not available on this device!");
+      }
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      alert("Failed to export CSV.");
+    }
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      const data = filteredData || []; // Use filteredData instead of fetching
+  
+      if (data.length === 0) {
+        alert("No data available for the current view!");
+        return;
+      }
+  
       // Prepare data for Excel
       const currentColumns = columnsMapping[selectedStage] || columnsMapping[1];
       const headers = currentColumns.map((col) => col.displayName);
-
-      const rows = data.map((item) =>
-        currentColumns.map((col) => item[col.dataKey] || "N/A")
+  
+      // Add row numbers dynamically for the "No" column
+      const rows = data.map((item, index) =>
+        currentColumns.map((col) =>
+          col.dataKey === "no" ? index + 1 : item[col.dataKey] || "N/A"
+        )
       );
-
+  
       const sheetData = [headers, ...rows]; // Combine headers and rows
-
+  
       // Create a worksheet
       const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
-
+  
       // Create a workbook
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Tenders");
-
+  
       // Write the workbook to binary
       const workbookOutput = XLSX.write(workbook, {
         type: "base64",
         bookType: "xlsx",
       });
-
+  
       // Save to file system
       const fileUri = `${FileSystem.documentDirectory}tenders.xlsx`;
-
+  
       await FileSystem.writeAsStringAsync(fileUri, workbookOutput, {
         encoding: FileSystem.EncodingType.Base64,
       });
-
+  
       // Share the file
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(fileUri, {
@@ -398,28 +384,30 @@ const handleExportCSV = async () => {
       alert("Failed to export Excel.");
     }
   };
+  
   const handlePrint = async () => {
     try {
-      // Fetch data for the current stage
-      const response = await fetch(
-        `${API_URL}/tender_stages?sfaStage=${selectedStage}`
-      );
-      const result = await response.json();
-      const data = result?.data || [];
-
+      const data = filteredData || []; // Use filteredData instead of fetching
+  
       if (data.length === 0) {
-        alert("No data available for the selected stage!");
+        alert("No data available for the current view!");
         return;
       }
-
+  
+      // Add numbering dynamically to each row
+      const numberedData = data.map((item, index) => ({
+        no: index + 1, // Add the "No" field
+        ...item, // Include the rest of the row data
+      }));
+  
       // Prepare printable HTML content
       const currentColumns = columnsMapping[selectedStage] || columnsMapping[1];
-      
+  
       const headers = currentColumns
         .map((col) => `<th>${col.displayName}</th>`)
         .join("");
-
-      const rows = data
+  
+      const rows = numberedData
         .map(
           (item) =>
             `<tr>${currentColumns
@@ -427,42 +415,7 @@ const handleExportCSV = async () => {
               .join("")}</tr>`
         )
         .join("");
-        const processedData = data.map((item, index) => {
-          const tenderValue = parseFloat(
-            item.tenderValue?.replace(/,/g, "") || 0
-          );
-          const tenderCost = parseFloat(item.tenderCost?.replace(/,/g, "") || 0);
-          const marginValue = currentColumns.some(
-            (col) => col.dataKey === "marginValue"
-          )
-            ? tenderValue - tenderCost
-            : null;
-          const marginPercentage = currentColumns.some(
-            (col) => col.dataKey === "marginPercentage"
-          )
-            ? tenderValue !== 0
-              ? (marginValue / tenderValue) * 100
-              : 0
-            : null;
   
-          return {
-            no: index + 1,
-            ...item,
-            marginValue: marginValue
-              ? marginValue.toLocaleString("en-MY", {
-                  style: "currency",
-                  currency: "MYR",
-                })
-              : null,
-            marginPercentage:
-              marginPercentage !== null
-                ? `${marginPercentage.toFixed(2)}%`
-                : null,
-            loaDate: item.loaDate
-              ? new Date(item.loaDate).toLocaleDateString("en-GB")
-              : "Please Update",
-          };
-        });
       const htmlContent = `
         <html>
           <head>
@@ -503,26 +456,17 @@ const handleExportCSV = async () => {
             <table>
               <thead>
                 <tr>
-                  ${currentColumns
-                    .map((col) => `<th>${col.displayName}</th>`)
-                    .join("")}
+                  ${headers}
                 </tr>
               </thead>
               <tbody>
-                ${processedData
-                  .map(
-                    (row) =>
-                      `<tr>${currentColumns
-                        .map((col) => `<td>${row[col.dataKey] || "N/A"}</td>`)
-                        .join("")}</tr>`
-                  )
-                  .join("")}
+                ${rows}
               </tbody>
             </table>
           </body>
         </html>
       `;
-
+  
       // Print the content
       await Print.printAsync({ html: htmlContent });
     } catch (error) {
@@ -530,7 +474,7 @@ const handleExportCSV = async () => {
       alert("Failed to print the content.");
     }
   };
-
+  
   return (
     <View style={styles.container}>
       {/* Search Bar with Icons */}
@@ -580,6 +524,7 @@ const handleExportCSV = async () => {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

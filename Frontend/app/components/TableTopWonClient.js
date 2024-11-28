@@ -3,7 +3,11 @@ import { View } from "react-native";
 import TableDashboard from "./TableDashboard";
 import { API_URL } from "../../env";
 
-export default function TableTopWonClient({ year, searchQuery }) {
+export default function TableTopWonClient({
+  year,
+  searchQuery,
+  onFilteredDataChange,
+}) {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // Filtered data for the table
 
@@ -29,7 +33,6 @@ export default function TableTopWonClient({ year, searchQuery }) {
 
         setData(formattedData);
         setFilteredData(formattedData); // Set both data and filteredData initially
-
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -38,27 +41,33 @@ export default function TableTopWonClient({ year, searchQuery }) {
     fetchData();
   }, [year]);
 
-    // Filter data based on the search query
-    useEffect(() => {
-      if (searchQuery.trim() === "") {
-        setFilteredData(data); // If search query is empty, show all data
-      } else {
-        const query = searchQuery.toLowerCase();
-        setFilteredData(
-          data.filter((item) =>
-            Object.values(item).some((value) =>
-              String(value).toLowerCase().includes(query)
-            )
+  // Filter data based on the search query
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredData(data); // If search query is empty, show all data
+    } else {
+      const query = searchQuery.toLowerCase();
+      setFilteredData(
+        data.filter((item) =>
+          Object.values(item).some((value) =>
+            String(value).toLowerCase().includes(query)
           )
-        );
-      }
-    }, [searchQuery, data]);
+        )
+      );
+    }
+  }, [searchQuery, data]);
 
+  // Emit filtered data to the parent component
+  useEffect(() => {
+    if (onFilteredDataChange) {
+      onFilteredDataChange(filteredData);
+    }
+  }, [filteredData, onFilteredDataChange]);
 
   return (
     <View style={{ flex: 1 }}>
       <TableDashboard
-      type={1}
+        type={1}
         data={filteredData}
         column={["Total Value Cost (RM)", "Total Number of Tender"]}
       />

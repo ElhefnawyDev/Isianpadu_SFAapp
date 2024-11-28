@@ -11,6 +11,7 @@ const screenHeight = Dimensions.get("window").height;
 
 export default function TenderStageScreen() {
   const [searchQuery, setSearchQuery] = useState(""); // Shared search state
+  const [filteredData, setFilteredData] = useState([]); // New state for filtered data
 
   return (
     <View style={styles.container}>
@@ -25,6 +26,7 @@ export default function TenderStageScreen() {
           <TableIconsNoticeBoard
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            filteredData={filteredData} // Pass filteredData to TableIcons
           />
         </View>
       </View>
@@ -32,7 +34,10 @@ export default function TenderStageScreen() {
       {/* Solid color for the bottom half */}
       <View style={styles.solidBackground}>
         <ScrollView contentContainerStyle={styles.contentContainer}>
-          <NoticeBoardTable searchQuery={searchQuery}></NoticeBoardTable>
+          <NoticeBoardTable
+            searchQuery={searchQuery}
+            onFilteredDataChange={(data) => setFilteredData(data)}
+          ></NoticeBoardTable>
         </ScrollView>
       </View>
     </View>

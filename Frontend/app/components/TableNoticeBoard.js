@@ -44,15 +44,15 @@ function TableNoticeBoard({ columns, data, itemsPerPage = 5, totalTenderValueWon
     const currentIndex = columns.findIndex(
       (col) => col.displayName === currentColumn
     );
-    const newIndex =
+  
+    // Calculate the new index
+    let newIndex =
       (currentIndex + (direction === "left" ? -1 : 1) + columns.length) %
       columns.length;
+  
+    // Update current column
     setCurrentColumn(columns[newIndex].displayName);
-  };
-
-  const toggleDropdown = (index) => {
-    setExpandedRow(expandedRow === index ? null : index);
-  };
+  };  
 
   const startIndex = (page - 1) * itemsPerPage;
   const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
@@ -127,9 +127,9 @@ function TableNoticeBoard({ columns, data, itemsPerPage = 5, totalTenderValueWon
           <View key={index}>
             <View style={styles.rowContainer}>
               <Text style={styles.columnRowTxtName}>
-                {item.tenderShortname.length > 17
-                  ? `${item.tenderShortname.substring(0, 17)}...`
-                  : item.tenderShortname}
+                {item?.tenderName?.length > 17
+                  ? `${item.tenderName.substring(0, 17)}...`
+                  : item.tenderName}
               </Text>
 
               <Text style={styles.columnRowTxt}>

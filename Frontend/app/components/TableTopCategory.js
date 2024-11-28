@@ -3,7 +3,11 @@ import { View } from "react-native";
 import TableDashboard from "./TableDashboard";
 import { API_URL } from "../../env";
 
-export default function TableTopCategory({ year,searchQuery }) {
+export default function TableTopCategory({
+  year,
+  searchQuery,
+  onFilteredDataChange,
+}) {
   const [data, setData] = useState([]);
   const [totalSubmission, setTotalSubmission] = useState(0);
   const [totalCost, setTotalCost] = useState("0");
@@ -48,32 +52,37 @@ export default function TableTopCategory({ year,searchQuery }) {
     fetchData();
   }, [year]);
 
-    // Filter data based on the search query
-    useEffect(() => {
-      if (searchQuery.trim() === "") {
-        setFilteredData(data); // If search query is empty, show all data
-      } else {
-        const query = searchQuery.toLowerCase();
-        setFilteredData(
-          data.filter((item) =>
-            Object.values(item).some((value) =>
-              String(value).toLowerCase().includes(query)
-            )
+  // Filter data based on the search query
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredData(data); // If search query is empty, show all data
+    } else {
+      const query = searchQuery.toLowerCase();
+      setFilteredData(
+        data.filter((item) =>
+          Object.values(item).some((value) =>
+            String(value).toLowerCase().includes(query)
           )
-        );
-      }
-    }, [searchQuery, data]);
+        )
+      );
+    }
+  }, [searchQuery, data]);
+
+  // Emit filtered data to the parent component
+  useEffect(() => {
+    if (onFilteredDataChange) {
+      onFilteredDataChange(filteredData);
+    }
+  }, [filteredData, onFilteredDataChange]);
+
   return (
     <View style={{ flex: 1 }}>
       <TableDashboard
-      type={2}
+        type={2}
         data={filteredData}
         totalSubmission={totalSubmission}
         totalCost={totalCost}
-        column={[
-          "Total Value Cost (RM)",
-          "Total Number of Tender",
-        ]}
+        column={["Total Value Cost (RM)", "Total Number of Tender"]}
       />
     </View>
   );

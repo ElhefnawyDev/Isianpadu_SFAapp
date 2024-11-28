@@ -19,6 +19,7 @@ export default function TableIconsDash({
   searchQuery,
   setSearchQuery,
   tableNo,
+  filteredData,
 }) {
   const [data, setData] = useState([]);
   const [formattedData, setFormattedData] = useState([]);
@@ -29,214 +30,29 @@ export default function TableIconsDash({
   const [formattedData6, setFormattedData6] = useState([]);
   const [totalSubmission, setTotalSubmission] = useState(0);
   const [totalCost, setTotalCost] = useState("0");
-  console.log(tableNo);
-  // Fetch data from the API
-  useEffect(() => {
-    const fetchData = async () => {
-      if (tableNo === 1) {
-        try {
-          const res = await fetch(
-            `${API_URL}/top20_clients?selected_year=${year}`
-          );
-          if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-          }
-
-          const { top20Clients } = await res.json();
-
-          // Format data for export
-          const formatted = top20Clients.map((client, index) => ({
-            no: index + 1,
-            name: client.client_name,
-            tenderNo: parseInt(client.tender_count, 10),
-            costValue: formatCurrency(parseFloat(client.total_tender_cost)),
-          }));
-
-          setData(top20Clients);
-          setFormattedData(formatted);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          Alert.alert("Error", "Failed to fetch data.");
-        }
-      } else if (tableNo === 2) {
-        try {
-          const res = await fetch(
-            `${API_URL}/sfa_tenderTable?selected_year=${year}`
-          );
-          if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-          }
-
-          const { aggregatedData } = await res.json();
-          console.log("Fetched Data:", aggregatedData); // Log the fetched data
-
-          // Format and structure data for TableDashboard
-          const formatted = aggregatedData.map((client) => ({
-            name: client.client_name,
-            tenderNo: parseInt(client.tender_count, 10),
-            costValue: formatCurrency(parseFloat(client.total_tender_cost)),
-          }));
-
-          console.log("Formatted Data test:", formattedData); // Log the formatted data
-          setData(formattedData);
-          setFormattedData2(formatted);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      } else if (tableNo === 3) {
-        try {
-          const res = await fetch(
-            `${API_URL}/top_client_prospect?selected_year=${year}`
-          );
-          if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-          }
-
-          const { topClientProspect } = await res.json();
-          console.log("Top 20:", topClientProspect); // Log the fetched data
-
-          // Format and structure data for TableDashboard
-          const formattedData = topClientProspect.map((client) => ({
-            name: client.client_name,
-            tenderNo: parseInt(client.tender_count, 10),
-            costValue: formatCurrency(parseFloat(client.total_tender_cost)),
-          }));
-
-          console.log("Formatted Top:", formattedData); // Log the formatted data
-          setData(formattedData);
-          setFormattedData3(formattedData);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      } else if (tableNo === 4) {
-        try {
-          const res = await fetch(
-            `${API_URL}/top_category?selected_year=${year}`
-          );
-          if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-          }
-
-          const { topCategoryData, totalSubmission, totalCost } =
-            await res.json();
-
-          // Handle totalCost by summing up parsed numbers in topCategoryData
-          const sumCost = topCategoryData.reduce(
-            (acc, curr) => acc + parseFloat(curr.total_tender_cost),
-            0
-          );
-
-          // Format and structure data for TableDashboard
-          const formattedData = topCategoryData.map((category) => ({
-            name: category.tender_category,
-            tenderNo: parseInt(category.tender_count, 10),
-            costValue: formatCurrency(parseFloat(category.total_tender_cost)),
-          }));
-
-          setData(formattedData);
-          setFormattedData4(formattedData);
-
-          setTotalSubmission(totalSubmission); // Set totalSubmission as received
-          setTotalCost(formatCurrency(sumCost)); // Format the calculated total cost
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      } else if (tableNo === 5) {
-        try {
-          const res = await fetch(
-            `${API_URL}/top_category_Prospect?selected_year=${year}`
-          );
-          if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-          }
-
-          const {
-            categoryProspectData,
-            totalCategoryProspectCount,
-            totalCost,
-          } = await res.json();
-
-          // Calculate totalCost from data if needed
-          const sumCost = categoryProspectData.reduce(
-            (acc, curr) => acc + parseFloat(curr.total_tender_cost),
-            0
-          );
-
-          // Format data for TableDashboard
-          const formattedData = categoryProspectData.map((category) => ({
-            name: category.tender_category,
-            tenderNo: parseInt(category.tender_count, 10),
-            costValue: formatCurrency(parseFloat(category.total_tender_cost)),
-          }));
-
-          setData(formattedData);
-          setFormattedData5(formattedData);
-          setTotalSubmission(totalCategoryProspectCount); // set totalSubmission
-          setTotalCost(formatCurrency(sumCost)); // format and set totalCost
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      } else {
-        try {
-          const res = await fetch(
-            `${API_URL}/top_category_won?selected_year=${year}`
-          );
-          if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-          }
-
-          const { categoryWonData, totalWonCount, totalCost } =
-            await res.json();
-
-          // Calculate totalCost from data if needed
-          const sumCost = categoryWonData.reduce(
-            (acc, curr) => acc + parseFloat(curr.total_tender_value),
-            0
-          );
-
-          // Format data for TableDashboard
-          const formattedData = categoryWonData.map((category) => ({
-            name: category.tender_category,
-            tenderNo: parseInt(category.tender_count, 10),
-            costValue: formatCurrency(parseFloat(category.total_tender_value)),
-          }));
-
-          setData(formattedData);
-          setFormattedData6(formattedData);
-          setTotalSubmission(totalWonCount); // set totalSubmission
-          setTotalCost(formatCurrency(sumCost)); // format and set totalCost
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-    };
-
-    fetchData();
-  }, [year]);
-
-  // Currency formatter
-  const formatCurrency = (num) =>
-    new Intl.NumberFormat("en-MY", {
-      style: "currency",
-      currency: "MYR",
-      minimumFractionDigits: 2,
-    }).format(num);
+ 
 
   // Export handlers
   const handleExportCSV = async () => {
     try {
+      const data = filteredData || []; // Use filteredData instead of fetching
+      if (data.length === 0) {
+        alert("No data available for the current view!");
+        return;
+      }
+
       const csvContent = Papa.unparse(
         tableNo === 1
-          ? formattedData
+          ? data
           : tableNo === 2
-          ? formattedData2
+          ? data
           : tableNo === 3
-          ? formattedData3
+          ? data
           : tableNo === 4
-          ? formattedData4
+          ? data
           : tableNo === 5
-          ? formattedData5
-          : formattedData6
+          ? data
+          : data
       );
       const fileUri = `${FileSystem.documentDirectory}top20_clients.csv`;
       await FileSystem.writeAsStringAsync(fileUri, csvContent, {
@@ -258,8 +74,10 @@ export default function TableIconsDash({
     }
   };
   const handleExportExcel = async () => {
-    if (!formattedData || formattedData.length === 0) {
-      Alert.alert("No data", "No data available for export.");
+    const data = filteredData || []; // Use filteredData instead of fetching
+
+    if (data.length === 0) {
+      alert("No data available for the current view!");
       return;
     }
 
@@ -270,44 +88,46 @@ export default function TableIconsDash({
         "Number of Tenders",
         "Total Value (RM)",
       ];
+      let rows = []; // Declare rows here
+
       if (tableNo === 1) {
-        const rows = formattedData.map((row) => [
-          row.no,
+        rows = data.map((row, index) => [
+          index + 1,
           row.name,
           row.tenderNo,
           row.costValue,
         ]);
       } else if (tableNo === 2) {
-        const rows = formattedData2.map((row) => [
-          row.no,
+        rows = data.map((row, index) => [
+          index + 1,
           row.name,
           row.tenderNo,
           row.costValue,
         ]);
       } else if (tableNo === 3) {
-        const rows = formattedData3.map((row) => [
-          row.no,
+        rows = formattedData3.map((row, index) => [
+          index + 1,
           row.name,
           row.tenderNo,
           row.costValue,
         ]);
       } else if (tableNo === 4) {
-        const rows = formattedData4.map((row) => [
-          row.no,
+        rows = formattedData4.map((row, index) => [
+          index + 1,
           row.name,
           row.tenderNo,
           row.costValue,
         ]);
       } else if (tableNo === 5) {
-        const rows = formattedData5.map((row) => [
-          row.no,
+        rows = formattedData5.map((row, index) => [
+          index + 1,
           row.name,
           row.tenderNo,
           row.costValue,
         ]);
       } else {
-        const rows = formattedData6.map((row) => [
-          row.no,
+        rows = formattedData6.map((row, index) => [
+          index + 1,
           row.name,
           row.tenderNo,
           row.costValue,
@@ -346,6 +166,13 @@ export default function TableIconsDash({
 
   const handleExportPDF = async () => {
     try {
+      const data = filteredData || []; // Use filteredData instead of fetching
+      if (data.length === 0) {
+        alert("No data available for the current view!");
+        return;
+      }
+      // Process data dynamically
+
       const tableHTML = `
         <html>
           <head>
@@ -381,11 +208,11 @@ export default function TableIconsDash({
               <tbody>
                 ${
                   tableNo === 1
-                    ? formattedData
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                        <td>${row.no}</td>
+                        <td>${index + 1}</td>
                         <td>${row.name}</td>
                         <td>${row.tenderNo}</td>
                         <td>${row.costValue}</td>
@@ -393,11 +220,11 @@ export default function TableIconsDash({
                         )
                         .join("")
                     : tableNo === 2
-                    ? formattedData2
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                          <td>${row.no}</td>
+                          <td>${index + 1}</td>
                           <td>${row.name}</td>
                           <td>${row.tenderNo}</td>
                           <td>${row.costValue}</td>
@@ -405,11 +232,11 @@ export default function TableIconsDash({
                         )
                         .join("")
                     : tableNo === 3
-                    ? formattedData3
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                              <td>${row.no}</td>
+                              <td>${index + 1}</td>
                               <td>${row.name}</td>
                               <td>${row.tenderNo}</td>
                               <td>${row.costValue}</td>
@@ -417,11 +244,11 @@ export default function TableIconsDash({
                         )
                         .join("")
                     : tableNo === 4
-                    ? formattedData4
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                                  <td>${row.no}</td>
+                                  <td>${index + 1}</td>
                                   <td>${row.name}</td>
                                   <td>${row.tenderNo}</td>
                                   <td>${row.costValue}</td>
@@ -429,22 +256,22 @@ export default function TableIconsDash({
                         )
                         .join("")
                     : tableNo === 5
-                    ? formattedData5
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                                      <td>${row.no}</td>
+                                      <td>${index + 1}</td>
                                       <td>${row.name}</td>
                                       <td>${row.tenderNo}</td>
                                       <td>${row.costValue}</td>
                                     </tr>`
                         )
                         .join("")
-                    : formattedData6
+                    : data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                                          <td>${row.no}</td>
+                                          <td>${index + 1}</td>
                                           <td>${row.name}</td>
                                           <td>${row.tenderNo}</td>
                                           <td>${row.costValue}</td>
@@ -471,6 +298,11 @@ export default function TableIconsDash({
   };
   const handlePrint = async () => {
     try {
+      const data = filteredData || []; // Use filteredData instead of fetching
+      if (data.length === 0) {
+        alert("No data available for the current view!");
+        return;
+      }
       const tableHTML = `
         <html>
           <head>
@@ -506,11 +338,11 @@ export default function TableIconsDash({
               <tbody>
                 ${
                   tableNo === 1
-                    ? formattedData
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                        <td>${row.no}</td>
+                        <td>${index + 1}</td>
                         <td>${row.name}</td>
                         <td>${row.tenderNo}</td>
                         <td>${row.costValue}</td>
@@ -518,11 +350,11 @@ export default function TableIconsDash({
                         )
                         .join("")
                     : tableNo === 2
-                    ? formattedData2
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                          <td>${row.no}</td>
+                          <td>${index + 1}</td>
                           <td>${row.name}</td>
                           <td>${row.tenderNo}</td>
                           <td>${row.costValue}</td>
@@ -530,11 +362,11 @@ export default function TableIconsDash({
                         )
                         .join("")
                     : tableNo === 3
-                    ? formattedData3
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                              <td>${row.no}</td>
+                              <td>${index + 1}</td>
                               <td>${row.name}</td>
                               <td>${row.tenderNo}</td>
                               <td>${row.costValue}</td>
@@ -542,11 +374,11 @@ export default function TableIconsDash({
                         )
                         .join("")
                     : tableNo === 4
-                    ? formattedData4
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                                  <td>${row.no}</td>
+                                  <td>${index + 1}</td>
                                   <td>${row.name}</td>
                                   <td>${row.tenderNo}</td>
                                   <td>${row.costValue}</td>
@@ -554,22 +386,22 @@ export default function TableIconsDash({
                         )
                         .join("")
                     : tableNo === 5
-                    ? formattedData5
+                    ? data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                                      <td>${row.no}</td>
+                                      <td>${index + 1}</td>
                                       <td>${row.name}</td>
                                       <td>${row.tenderNo}</td>
                                       <td>${row.costValue}</td>
                                     </tr>`
                         )
                         .join("")
-                    : formattedData6
+                    : data
                         .map(
-                          (row) =>
+                          (row, index) =>
                             `<tr>
-                                          <td>${row.no}</td>
+                                          <td>${index + 1}</td>
                                           <td>${row.name}</td>
                                           <td>${row.tenderNo}</td>
                                           <td>${row.costValue}</td>
