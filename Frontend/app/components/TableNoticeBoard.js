@@ -62,6 +62,10 @@ function TableNoticeBoard({ columns, data, itemsPerPage = 5, totalTenderValueWon
     setPage(newPage);
   };
 
+  const toggleDropdown = (index) => {
+    setExpandedRow(expandedRow === index ? null : index);
+  };
+
   const renderTableHeader = useCallback(
     () => (
       <View style={styles.tableHeader}>
