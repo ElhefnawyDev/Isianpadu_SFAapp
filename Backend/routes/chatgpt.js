@@ -14,12 +14,10 @@ chatbot.get("/tender_Progress", async (req, res) => {
   try {
     const selected_year = req.query.selected_year;
     if (!selected_year) {
-      return res
-        .status(400)
-        .send({
-          success: false,
-          message: "selected_year query parameter is required",
-        });
+      return res.status(400).send({
+        success: false,
+        message: "selected_year query parameter is required",
+      });
     }
 
     const selectedYearInt = parseInt(selected_year);
@@ -558,15 +556,15 @@ chatbot.get("/sales_stage", async (req, res) => {
   }
 });
 
-
-
 chatbot.get("/sales_team_tender_List", async (req, res) => {
   try {
     // Extract salesteamID from query parameters
     const { salesteamID } = req.query;
-    
+
     if (!salesteamID) {
-      return res.status(400).send({ success: false, message: "salesteamID is required" });
+      return res
+        .status(400)
+        .send({ success: false, message: "salesteamID is required" });
     }
 
     // Fetch all necessary data from the database
@@ -580,10 +578,14 @@ chatbot.get("/sales_team_tender_List", async (req, res) => {
     const sfa_tender_category = await prisma.sfa_tender_category.findMany();
 
     // Check if the provided salesteamID exists in the database
-    const salesteam = sfa_salesteam.find((team) => team.staff_id === parseInt(salesteamID));
-    
+    const salesteam = sfa_salesteam.find(
+      (team) => team.staff_id === parseInt(salesteamID)
+    );
+
     if (!salesteam) {
-      return res.status(404).send({ success: false, message: "Sales team not found" });
+      return res
+        .status(404)
+        .send({ success: false, message: "Sales team not found" });
     }
 
     // Filter tenders assigned to this specific sales team
@@ -637,7 +639,9 @@ chatbot.get("/sales_team_tender_List", async (req, res) => {
         client_details: client ? client.client_name : null,
         stage: stages ? stages.stage_name : null,
         notice_details: enrichedNotice, // Include enriched notice
-        tenderCategory: tender_category ? tender_category.tender_category : null,
+        tenderCategory: tender_category
+          ? tender_category.tender_category
+          : null,
         tender_cost: tender.tender_cost,
         tender_value: tender.tender_value,
         contractPeriod: tender.contract_period,
@@ -658,10 +662,11 @@ chatbot.get("/sales_team_tender_List", async (req, res) => {
       tenders: enrichedTenders.length > 0 ? enrichedTenders : 0,
       tenderCount: enrichedTenders.length, // Count of associated tenders
     });
-    
   } catch (error) {
     console.error(error);
-    res.status(500).send({ success: false, message: "Failed to fetch sales team data" });
+    res
+      .status(500)
+      .send({ success: false, message: "Failed to fetch sales team data" });
   }
 });
 
@@ -695,11 +700,116 @@ chatbot.get("/sales_team_list", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send({ success: false, message: "Failed to fetch sales team tender counts" });
+    res.status(500).send({
+      success: false,
+      message: "Failed to fetch sales team tender counts",
+    });
   }
 });
+chatbot.get("/tenderByName", async (req, res) => {
+  try {
+    const tender_name = req.query.tender_name;
 
+    if (!tender_name) {
+      return res.status(400).json({ message: "tender name is required" });
+    }
 
+    // Convert the input tender_name to lowercase for case-insensitive comparison
+    const lowerCaseTenderName = tender_name.toLowerCase();
 
+    const result = await prisma.sfa_tender.findMany({
+      where: {
+        delete_id: 0,
+      },
+    });
+
+    // Filter results on the server side (case-insensitive)
+    const filteredResult = result.filter((tender) => {
+      return tender.tender_shortname.toLowerCase() === lowerCaseTenderName;
+    });
+
+    if (filteredResult.length === 0) {
+      const partialMatchResult = result.filter((tender) => {
+        return tender.tender_shortname.toLowerCase().includes(lowerCaseTenderName);
+      });
+
+      const formattedResult = partialMatchResult.map((tender) => ({
+        tender_name: tender.tender_shortname,
+      }));
+
+      return res.status(200).json({
+        message:
+          "You may ask the user the following question: Do you mean any of these tenders?",
+        Tender_details: formattedResult,
+      });
+    }
+
+    // Get associated details for the tender
+    const tenderDetails = await Promise.all(
+      filteredResult.map(async (tender) => {
+        // Get the staff name using id_adm_profileSP from sfa_tender
+        const staff = await prisma.sfa_salesteam.findFirst({
+          where: {
+            staff_id: tender.id_adm_profileSP,  // Correctly reference the tender's staff ID
+          },
+          select: {
+            name: true,  // Get the name of the staff
+          },
+        });
+
+        // Get the client name
+        const client = await prisma.sfa_client.findFirst({
+          where: {
+            client_id: tender.id_sfa_client,
+          },
+          select: {
+            client_name: true,
+          },
+        });
+
+        // Get the stage of the tender
+        const stage = await prisma.sfa_stages.findFirst({
+          where: {
+            stages_id: tender.id_sfa_stages,
+          },
+          select: {
+            stage_name: true,
+          },
+        });
+
+        // Get the category of the tender
+        const category = await prisma.sfa_tender_category.findFirst({
+          where: {
+            tender_category_id: tender.id_sfa_tender_category,
+          },
+          select: {
+            tender_category: true,
+          },
+        });
+
+        // Format the tender details
+        return {
+          tender_id: tender.tender_id,
+          tender_name: tender.tender_shortname,
+          deadline: tender.deadline,
+          stage: stage ? stage.stage_name : null,
+          category: category ? category.tender_category : null,
+          client_name: client ? client.client_name : null,
+          staff_name: staff ? staff.name : null,
+        };
+      })
+    );
+
+    // Send the formatted response
+    return res.status(200).json({
+      success: true,
+      Tender_details: tenderDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+ 
 
 export default chatbot;

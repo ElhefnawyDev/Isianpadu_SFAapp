@@ -4,7 +4,6 @@ import TenderStageTable from "../components/TenderStageTables/TenderStageTable";
 import { LinearGradient } from "expo-linear-gradient";
 import TableIcons from "../components/TableIcons";
 import StageSelector from "../components/TenderStageTables/TenderStageDropdown";
-
 const screenHeight = Dimensions.get("window").height;
 
 export default function TenderStageScreen() {

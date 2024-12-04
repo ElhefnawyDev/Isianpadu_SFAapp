@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import ProgressCard from "../components/ProgressCard";
 import { API_URL } from "../../env.js";
 function ProgressCards({ year }) {
@@ -14,9 +14,12 @@ function ProgressCards({ year }) {
   const [networkTender, setNetworkTender] = useState(0);
   const [softwareTender, setSoftwareTender] = useState(0);
   const [systemTender, setSystemTender] = useState(0);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true); // Set loading to true
+
       try {
         const res = await fetch(`${API_URL}/sfa_tender`);
 
@@ -141,6 +144,8 @@ function ProgressCards({ year }) {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false); // Set loading to false after fetching
       }
     };
 
@@ -217,24 +222,29 @@ function ProgressCards({ year }) {
   const areAllZero = ProgressCardData.every((item) => item.num === 0);
 
   return (
-    <View>
-      {areAllZero ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.textData}>No data available</Text>
-        </View>
+    <View style={styles.container}>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#00adf5" style={styles.loader} />
       ) : (
-        <View style={styles.gridContainer}>
-          {ProgressCardData.map((item, index) => (
-            <View key={index} style={styles.gridItem}>
-
-                <ProgressCard
-                  title={item.title}
-                  num={item.num}
-                  icon={item.icon}
-                  ids={item.ids}
-                />
+        <View>
+          {areAllZero ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.textData}>No data available</Text>
             </View>
-          ))}
+          ) : (
+            <View style={styles.gridContainer}>
+              {ProgressCardData.map((item, index) => (
+                <View key={index} style={styles.gridItem}>
+                  <ProgressCard
+                    title={item.title}
+                    num={item.num}
+                    icon={item.icon}
+                    ids={item.ids}
+                  />
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       )}
     </View>
@@ -256,17 +266,16 @@ const styles = StyleSheet.create({
   emptyContainer: {
     justifyContent: "center", // Center vertically
     alignItems: "center", // Center horizontally
-    height:200,
-    backgroundColor:"white",
+    height: 200,
+    backgroundColor: "white",
     marginHorizontal: 10,
-    borderRadius:25,
+    borderRadius: 25,
   },
   textData: {
     fontSize: 20, // Optional: Adjust font size for better readability
     textAlign: "center",
-    color:"gray"
+    color: "gray",
   },
 });
-
 
 export default ProgressCards;

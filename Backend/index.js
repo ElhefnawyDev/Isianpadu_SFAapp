@@ -14,6 +14,7 @@ import eventCalendar from "./routes/events.js";
 import tenderStageTable from "./routes/TenderStageTablesRoute.js";
 import noticeRouter from "./routes/noticeBoardTable.js";
 import chatbot from "./routes/chatgpt.js";
+import gemini from "./routes/GenAI.js";
 
 const app = express();
 app.use(cors());
@@ -32,6 +33,7 @@ app.use("/api", eventCalendar);
 app.use("/api", tenderStageTable);
 app.use("/api", noticeRouter);
 app.use("/api", chatbot);
+app.use("/api", gemini);
 
 app.listen(4000, () => {
   console.log("server is running on port 4000");
