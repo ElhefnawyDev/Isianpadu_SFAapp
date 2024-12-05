@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    top: "18%",
+    top: "11%",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     backgroundColor: "white",

@@ -6,6 +6,7 @@ import {
   Button,
   Text,
   TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import Speedometer from "../components/Speedometer";
 import { API_URL } from "../../env.js";
@@ -31,12 +32,32 @@ const ShowMoreLessButton = ({ isGridView, onPress }) => {
 
 function TargetProgress({ year }) {
   const [isGridView, setIsGridView] = useState(false);
+  const [isShowMoreVisible, setIsShowMoreVisible] = useState(true); // New state
   const [totalTenderValue, setTotalTenderValue] = useState(0);
   const [minTarget, setMinTarget] = useState(0);
   const [minTargetFiveYear, setMinTargetFiveYear] = useState(0);
   const [totalTenderFiveYear, setTotalTenderFiveYear] = useState(0);
   const [yearlyTargetFiveYear, setYearlyTargetFiveYear] = useState(0);
   const [yearlyTarget, setYearlyTarget] = useState(0);
+
+  useEffect(() => {
+    const updateShowMoreVisibility = () => {
+      const screenWidth = Dimensions.get("window").width;
+      setIsShowMoreVisible(screenWidth < 768); // Hide the button for large screens
+    };
+
+    updateShowMoreVisibility(); // Initial check
+
+    // Listen for dimension changes
+    const subscription = Dimensions.addEventListener(
+      "change",
+      updateShowMoreVisibility
+    );
+
+    return () => {
+      subscription.remove(); // Clean up listener
+    };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -145,12 +166,14 @@ function TargetProgress({ year }) {
         </ScrollView>
       )}
 
-      <View style={styles.containerShowMore}>
-        <ShowMoreLessButton
-          isGridView={isGridView}
-          onPress={() => setIsGridView(!isGridView)}
-        />
-      </View>
+      {isShowMoreVisible && ( // Conditionally render the button
+        <View style={styles.containerShowMore}>
+          <ShowMoreLessButton
+            isGridView={isGridView}
+            onPress={() => setIsGridView(!isGridView)}
+          />
+        </View>
+      )}
     </View>
   );
 }

@@ -7,8 +7,11 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Dimensions,
 } from "react-native";
 import { API_URL } from "../../env.js";
+
+const { width } = Dimensions.get("window");
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -36,14 +39,17 @@ export default function Login() {
     }
   }
 
+  // Dynamically adjust the image height based on the screen width
+  const imageHeight = width > 400 ? "150%" : "120%"; // Example condition for larger screens
+
   return (
     <View style={styles.container}>
       <Image
         source={require("../assets/logincircle.png")}
-        style={styles.image}
-      ></Image>
+        style={[styles.image, { height: imageHeight }]} // Apply dynamic height
+      />
 
-      <Image style={styles.logo} source={require("../assets/logo.png")}></Image>
+      <Image style={styles.logo} source={require("../assets/logo.png")} />
       <Text style={styles.title}>SFA SYSTEM</Text>
 
       <Text style={styles.subtitle}>SIGN IN</Text>
@@ -81,8 +87,7 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    height: "120%",
-    width: "120%",
+    width: "120%", // Default width for image
     resizeMode: "contain",
     position: "absolute",
     top: 80,
@@ -93,7 +98,6 @@ const styles = StyleSheet.create({
     top: "5%",
     height: 120,
     width: 120,
-
     resizeMode: "contain",
   },
 

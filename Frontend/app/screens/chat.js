@@ -7,11 +7,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../../env";
 import { DJANGO_API_URL } from "../../env";
 import Markdown from "react-native-markdown-display";
+import { LinearGradient } from "expo-linear-gradient";
+import TokenModelSelector from "../components/TokenModelSelection";
+const screenHeight = Dimensions.get("window").height;
 
 const ChatScreen = () => {
   const [messages, setMessages] = useState([]);
@@ -20,8 +24,13 @@ const ChatScreen = () => {
   const [loadingWord, setLoadingWord] = useState(""); // Current loading word
   const [selectedAPI, setSelectedAPI] = useState("SFA"); // Default API selection
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown visibility
+  const [token, setToken] = useState(); // Dropdown visibility
+  const [requestLeft, setRequestLeft] = useState(); // Dropdown visibility
   const flatListRef = useRef();
-
+  const [selectedPlan, setSelectedPlan] = useState("Free");
+  const handleSelectedPlanChange = (plan) => {
+    setSelectedPlan(plan);
+  };
   const loadingWords = [
     "Thinking...",
     "Processing...",
@@ -51,7 +60,10 @@ const ChatScreen = () => {
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: textInput }),
+        body: JSON.stringify({
+          question: textInput,
+          model: selectedPlan === "Free" ? "gemini" : "chatgpt",
+        }),
       });
 
       if (!response.ok) {
@@ -64,6 +76,11 @@ const ChatScreen = () => {
         text: data.result,
         sender: "bot",
       };
+      if(selectedPlan==="Free"){
+        setRequestLeft(data.requests_left)
+      }else{
+        setToken(data.cumulative_cost)
+      }
 
       setMessages((prevMessages) => [...prevMessages, botResponse]);
     } catch (error) {
@@ -108,254 +125,287 @@ const ChatScreen = () => {
           isUser ? styles.userMessage : styles.botMessage,
         ]}
       >
-        <Markdown
-          style={markdownStyles}
-        >
-          {item.text}
-        </Markdown>
+        <Markdown style={markdownStyles}>{item.text}</Markdown>
       </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      <View></View>
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.chatContent}
+      {/* Gradient for the top half */}
+      <LinearGradient
+        colors={["#405de5", "#263788"]}
+        style={styles.gradientBackground}
       />
-      {isBotTyping && (
-        <View style={styles.typingContainer}>
-          <ActivityIndicator size="small" color="#4361EE" />
-          <Text style={styles.typingText}>{loadingWord}</Text>
-        </View>
-      )}
-      <View style={styles.inputBar}>
-        <TouchableOpacity
-          style={styles.dropdownToggle}
-          onPress={() => setIsDropdownOpen((prev) => !prev)}
-        >
-          <Text style={styles.dropdownText}>{selectedAPI}</Text>
-          <Icon
-            name={isDropdownOpen ? "chevron-up" : "chevron-down"}
-            size={20}
-            color="#fff"
+
+      <View style={styles.contentContainer}>
+        <View style={styles.rowContainer}>
+          <TokenModelSelector
+            modelSelected={selectedAPI === "SQL" ? "Pro" : "gemini"}
+            tokenCount={parseFloat(token).toFixed(4)}
+            RequestsLeft={requestLeft}
+            onSelectedPlanChange={handleSelectedPlanChange}
           />
-        </TouchableOpacity>
-        {isDropdownOpen && (
-          <View style={styles.dropdownMenu}>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={() => {
-                setSelectedAPI("SFA");
-                setIsDropdownOpen(false);
-              }}
-            >
-              <Text style={styles.dropdownItemText}>SFA</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={() => {
-                setSelectedAPI("SQL");
-                setIsDropdownOpen(false);
-              }}
-            >
-              <Text style={styles.dropdownItemText}>SQL</Text>
-            </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.solidBackground}>
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.chatContent}
+        />
+        {isBotTyping && (
+          <View style={styles.typingContainer}>
+            <ActivityIndicator size="small" color="#4361EE" />
+            <Text style={styles.typingText}>{loadingWord}</Text>
           </View>
         )}
-        <TextInput
-          style={styles.textInput}
-          placeholder="Type a message..."
-          value={textInput}
-          onChangeText={setTextInput}
-        />
-        <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-          <Icon name="send" size={20} color="white" />
-        </TouchableOpacity>
+        <View style={styles.inputBar}>
+          <TouchableOpacity
+            style={styles.dropdownToggle}
+            onPress={() => setIsDropdownOpen((prev) => !prev)}
+          >
+            <Text style={styles.dropdownText}>{selectedAPI}</Text>
+            <Icon
+              name={isDropdownOpen ? "chevron-up" : "chevron-down"}
+              size={20}
+              color="#fff"
+            />
+          </TouchableOpacity>
+          {isDropdownOpen && (
+            <View style={styles.dropdownMenu}>
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setSelectedAPI("SFA");
+                  setIsDropdownOpen(false);
+                }}
+              >
+                <Text style={styles.dropdownItemText}>SFA</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setSelectedAPI("SQL");
+                  setIsDropdownOpen(false);
+                }}
+              >
+                <Text style={styles.dropdownItemText}>SQL</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          <TextInput
+            style={styles.textInput}
+            placeholder="Type a message..."
+            value={textInput}
+            onChangeText={setTextInput}
+          />
+          <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+            <Icon name="send" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 };
 
-const markdownStyles= StyleSheet.create({
-    // The main container
-    body: {color: "white"},
-  
-    // Headings
-    heading1: {
-      flexDirection: 'row',
-      fontSize: 32,
-    },
-    heading2: {
-      flexDirection: 'row',
-      fontSize: 24,
-    },
-    heading3: {
-      flexDirection: 'row',
-      fontSize: 18,
-    },
-    heading4: {
-      flexDirection: 'row',
-      fontSize: 16,
-    },
-    heading5: {
-      flexDirection: 'row',
-      fontSize: 13,
-    },
-    heading6: {
-      flexDirection: 'row',
-      fontSize: 11,
-    },
-  
-    // Horizontal Rule
-    hr: {
-      backgroundColor: 'white',
-      height: 1,
-    },
-  
-    // Emphasis
-    strong: {
-      color: "white",
-      fontWeight: 'bold',
-    },
-    em: {
-      fontStyle: 'italic',
-    },
-    s: {
-      textDecorationLine: 'line-through',
-    },
-  
-    // Blockquotes
-    blockquote: {
-      backgroundColor: 'white',
-      borderColor: '#CCC',
-      borderLeftWidth: 4,
-      marginLeft: 5,
-      paddingHorizontal: 5,
-    },
-  
-    // Lists
-    bullet_list: {},
-    ordered_list: {},
-    list_item: {
-      flexDirection: 'row',
-      justifyContent: 'flex-start',
-    },
-    // @pseudo class, does not have a unique render rule
-    bullet_list_icon: {
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    // @pseudo class, does not have a unique render rule
-    bullet_list_content: {
-      flex: 1,
-    },
-    // @pseudo class, does not have a unique render rule
-    ordered_list_icon: {
-      marginLeft: 10,
-      marginRight: 10,
-    },
-    // @pseudo class, does not have a unique render rule
-    ordered_list_content: {
-      flex: 1,
-    },
-  
-    // Code
-    code_inline: {
-      borderWidth: 1,
-      borderColor: 'white',
-      backgroundColor: 'white',
-      padding: 10,
-      borderRadius: 4,
-    },
-    code_block: {
-      borderWidth: 1,
-      borderColor: 'black',
-      backgroundColor: 'black',
-      padding: 10,
-      borderRadius: 4,
-    },
-    fence: {
-      borderWidth: 1,
-      borderColor: '#1f467e',
-      backgroundColor: '#1f467e',
-      padding: 10,
-      borderRadius: 4,
-    },
-  
-    // Tables
-    table: {
-      borderWidth: 1,
-      borderColor: '#000000',
-      borderRadius: 3,
-    },
-    thead: {},
-    tbody: {},
-    th: {
-      flex: 1,
-      padding: 5,
-    },
-    tr: {
-      borderBottomWidth: 1,
-      borderColor: '#000000',
-      flexDirection: 'row',
-    },
-    td: {
-      flex: 1,
-      padding: 5,
-    },
-  
-    // Links
-    link: {
-      textDecorationLine: 'underline',
-    },
-    blocklink: {
-      flex: 1,
-      borderColor: '#000000',
-      borderBottomWidth: 1,
-      
-    },
-  
-    // Images
-    image: {
-      flex: 1,
-    },
-  
-    // Text Output
-    text: {color: 'white'},
-    textgroup: {color: 'white'},
-    paragraph: {
-      color: 'white',
-      marginTop: 10,
-      marginBottom: 10,
-      flexWrap: 'wrap',
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      justifyContent: 'flex-start',
-      width: '100%',
-    },
-    hardbreak: {
-      color: 'white',
-      width: '100%',
-      height: 1,
-    },
-    softbreak: {color: 'white'},
-  
-    // Believe these are never used but retained for completeness
-    pre: {},
-    inline: {},
-    span: {},
-  
-})
+const markdownStyles = StyleSheet.create({
+  // The main container
+  body: { color: "white" },
+
+  // Headings
+  heading1: {
+    flexDirection: "row",
+    fontSize: 32,
+  },
+  heading2: {
+    flexDirection: "row",
+    fontSize: 24,
+  },
+  heading3: {
+    flexDirection: "row",
+    fontSize: 18,
+  },
+  heading4: {
+    flexDirection: "row",
+    fontSize: 16,
+  },
+  heading5: {
+    flexDirection: "row",
+    fontSize: 13,
+  },
+  heading6: {
+    flexDirection: "row",
+    fontSize: 11,
+  },
+
+  // Horizontal Rule
+  hr: {
+    backgroundColor: "white",
+    height: 1,
+  },
+
+  // Emphasis
+  strong: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  em: {
+    fontStyle: "italic",
+  },
+  s: {
+    textDecorationLine: "line-through",
+  },
+
+  // Blockquotes
+  blockquote: {
+    backgroundColor: "white",
+    borderColor: "#CCC",
+    borderLeftWidth: 4,
+    marginLeft: 5,
+    paddingHorizontal: 5,
+  },
+
+  // Lists
+  bullet_list: {},
+  ordered_list: {},
+  list_item: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+  },
+  // @pseudo class, does not have a unique render rule
+  bullet_list_icon: {
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  // @pseudo class, does not have a unique render rule
+  bullet_list_content: {
+    flex: 1,
+  },
+  // @pseudo class, does not have a unique render rule
+  ordered_list_icon: {
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  // @pseudo class, does not have a unique render rule
+  ordered_list_content: {
+    flex: 1,
+  },
+
+  // Code
+  code_inline: {
+    borderWidth: 1,
+    borderColor: "white",
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 4,
+  },
+  code_block: {
+    borderWidth: 1,
+    borderColor: "black",
+    backgroundColor: "black",
+    padding: 10,
+    borderRadius: 4,
+  },
+  fence: {
+    borderWidth: 1,
+    borderColor: "#1f467e",
+    backgroundColor: "#1f467e",
+    padding: 10,
+    borderRadius: 4,
+  },
+
+  // Tables
+  table: {
+    borderWidth: 1,
+    borderColor: "#000000",
+    borderRadius: 3,
+  },
+  thead: {},
+  tbody: {},
+  th: {
+    flex: 1,
+    padding: 5,
+  },
+  tr: {
+    borderBottomWidth: 1,
+    borderColor: "#000000",
+    flexDirection: "row",
+  },
+  td: {
+    flex: 1,
+    padding: 5,
+  },
+
+  // Links
+  link: {
+    textDecorationLine: "underline",
+  },
+  blocklink: {
+    flex: 1,
+    borderColor: "#000000",
+    borderBottomWidth: 1,
+  },
+
+  // Images
+  image: {
+    flex: 1,
+  },
+
+  // Text Output
+  text: { color: "white" },
+  textgroup: { color: "black" },
+  paragraph: {
+    color: "white",
+    marginTop: 10,
+    marginBottom: 10,
+    flexWrap: "wrap",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    width: "100%",
+  },
+  hardbreak: {
+    color: "white",
+    width: "100%",
+    height: 1,
+  },
+  softbreak: { color: "white" },
+
+  // Believe these are never used but retained for completeness
+  pre: {},
+  inline: {},
+  span: {},
+});
 
 const styles = StyleSheet.create({
+  rowContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    width: "80%",
+    height: 90,
+    marginBottom: 50,
+    zIndex: 20,
+  },
+  contentContainer: {
+    alignItems: "center",
+    paddingBottom: 40,
+    zIndex: 10,
+  },
+  gradientBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: screenHeight / 2,
+    zIndex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "white",
   },
   header: {
     paddingTop: 50,
@@ -456,6 +506,17 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: "#515151",
     fontStyle: "italic",
+  },
+  solidBackground: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: "12%",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    backgroundColor: "white",
+    zIndex: 1,
   },
 });
 

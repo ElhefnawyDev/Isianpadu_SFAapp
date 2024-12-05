@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   box: {
-    width: 170,
+    width: "100%",
     height: 95,
     borderRadius: 15,
     backgroundColor: "white",

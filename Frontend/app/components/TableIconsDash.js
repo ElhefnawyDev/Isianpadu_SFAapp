@@ -54,7 +54,7 @@ export default function TableIconsDash({
           ? data
           : data
       );
-      const fileUri = `${FileSystem.documentDirectory}top20_clients.csv`;
+      const fileUri = `${FileSystem.documentDirectory}Top_Clients_Categories.csv`;
       await FileSystem.writeAsStringAsync(fileUri, csvContent, {
         encoding: FileSystem.EncodingType.UTF8,
       });
@@ -136,13 +136,13 @@ export default function TableIconsDash({
 
       const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Top20Clients");
+      XLSX.utils.book_append_sheet(workbook, worksheet, "TopClientsCategories");
 
       const workbookOutput = XLSX.write(workbook, {
         type: "base64",
         bookType: "xlsx",
       });
-      const fileUri = `${FileSystem.documentDirectory}top20_clients.xlsx`;
+      const fileUri = `${FileSystem.documentDirectory}Top_Clients_Categories.xlsx`;
 
       await FileSystem.writeAsStringAsync(fileUri, workbookOutput, {
         encoding: FileSystem.EncodingType.Base64,
@@ -195,7 +195,7 @@ export default function TableIconsDash({
             </style>
           </head>
           <body>
-            <h1>Top 20 Clients - ${year}</h1>
+            <h1>${tableNo === 1 ? "Top 20 Clients" : tableNo === 2 ? "Top Client (Won)" : tableNo === 3 ? "Top Client (Prospect)" : tableNo === 4 ? "Top Category" :  tableNo === 5 ? "Top Category (Prospect)" : "Top Category (Won)"} - ${year}</h1>
             <table>
               <thead>
                 <tr>
@@ -325,7 +325,7 @@ export default function TableIconsDash({
             </style>
           </head>
           <body>
-            <h1>Top 20 Clients - ${year}</h1>
+            <h1>${tableNo === 1 ? "Top 20 Clients" : tableNo === 2 ? "Top Client (Won)" : tableNo === 3 ? "Top Client (Prospect)" : tableNo === 4 ? "Top Category" :  tableNo === 5 ? "Top Category (Prospect)" : "Top Category (Won)"} - ${year}</h1>
             <table>
               <thead>
                 <tr>
