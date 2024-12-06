@@ -39,19 +39,27 @@ function TargetProgress({ year }) {
   const [totalTenderFiveYear, setTotalTenderFiveYear] = useState(0);
   const [yearlyTargetFiveYear, setYearlyTargetFiveYear] = useState(0);
   const [yearlyTarget, setYearlyTarget] = useState(0);
+  const [gridItemWidth, setGridItemWidth] = useState(170); // State for dynamic grid item width
 
   useEffect(() => {
-    const updateShowMoreVisibility = () => {
+    const updateDimensions = () => {
       const screenWidth = Dimensions.get("window").width;
-      setIsShowMoreVisible(screenWidth < 768); // Hide the button for large screens
+      setIsShowMoreVisible(screenWidth < 768); // Hide the button for larger screens
+      
+      // Dynamically adjust the gridItem width based on screen size
+      if (screenWidth < 500) {
+        setGridItemWidth(150); // Smaller width for small screens
+      } else {
+        setGridItemWidth(170); // Default width for larger screens
+      }
     };
 
-    updateShowMoreVisibility(); // Initial check
+    updateDimensions(); // Initial check
 
     // Listen for dimension changes
     const subscription = Dimensions.addEventListener(
       "change",
-      updateShowMoreVisibility
+      updateDimensions
     );
 
     return () => {
@@ -137,7 +145,10 @@ function TargetProgress({ year }) {
       {isGridView ? (
         <View style={styles.gridContainer}>
           {filteredSpeedometerData.map((item, index) => (
-            <View key={index} style={styles.gridItem}>
+            <View
+              key={index}
+              style={[styles.gridItem, { width: gridItemWidth }]} // Dynamically set the width
+            >
               <Speedometer
                 key={item.id}
                 title={item.title}
@@ -205,7 +216,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   gridItem: {
-    width: 170,
     height: 170,
     margin: 10,
   },

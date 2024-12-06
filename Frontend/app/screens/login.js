@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: "120%", // Default width for image
+    width: "160%", // Default width for image
     resizeMode: "contain",
     position: "absolute",
     top: 80,
