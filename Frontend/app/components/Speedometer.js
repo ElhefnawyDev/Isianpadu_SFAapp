@@ -12,7 +12,7 @@ function Speedometer({ title, current, target }) {
       setIsShowMoreVisible(screenWidth < 400); // Hide the button for large screens
       // Adjust box size based on screen width
       if (screenWidth < 500) {
-        setBoxSize(150); // Smaller size for screens less than 500px
+        setBoxSize(160); // Smaller size for screens less than 500px
       } else {
         setBoxSize(170); // Default size for larger screens
       }
