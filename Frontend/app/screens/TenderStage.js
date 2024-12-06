@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { ScrollView, View, StyleSheet, Dimensions } from "react-native";
+import { ScrollView, View, StyleSheet, Dimensions, Text } from "react-native";
 import TenderStageTable from "../components/TenderStageTables/TenderStageTable";
 import { LinearGradient } from "expo-linear-gradient";
 import TableIcons from "../components/TableIcons";
 import StageSelector from "../components/TenderStageTables/TenderStageDropdown";
 const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width;
 
 export default function TenderStageScreen() {
   const [searchQuery, setSearchQuery] = useState(""); // Shared search state
@@ -56,6 +57,7 @@ export default function TenderStageScreen() {
       <View style={styles.solidBackground}>
         <ScrollView contentContainerStyle={styles.contentContainer}>
           {/* Tender Stage Table */}
+          {screenWidth<388 && <Text></Text>}
           <TenderStageTable
             searchQuery={searchQuery}
             selectedStage={stageNumber}

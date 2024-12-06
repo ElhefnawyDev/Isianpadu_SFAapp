@@ -13,6 +13,7 @@ import { API_URL } from "../../env.js";
 import { Feather } from "@expo/vector-icons"; // Feather icon library
 
 const ShowMoreLessButton = ({ isGridView, onPress }) => {
+  
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
       <View style={styles.iconAndText}>
