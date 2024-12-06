@@ -47,7 +47,7 @@ function TargetProgress({ year }) {
       setIsShowMoreVisible(screenWidth < 768); // Hide the button for larger screens
       
       // Dynamically adjust the gridItem width based on screen size
-      if (screenWidth < 500) {
+      if (screenWidth < 388) {
         setGridItemWidth(150); // Smaller width for small screens
       } else {
         setGridItemWidth(170); // Default width for larger screens
