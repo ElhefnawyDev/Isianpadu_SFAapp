@@ -41,7 +41,7 @@ const chat = model.startChat({
   },
 });
 
-gemini.post("/ask", async (req, res) => {
+gemini.post("/ask", authenticateToken, async (req, res) => {
   const { question } = req.body;
 
   // if (!question) {

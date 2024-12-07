@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
-  Platform
+  Platform,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../../env";
@@ -19,6 +19,8 @@ import { DJANGO_API_URL } from "../../env";
 import Markdown from "react-native-markdown-display";
 import { LinearGradient } from "expo-linear-gradient";
 import TokenModelSelector from "../components/TokenModelSelection";
+import { apiClient } from "../../apiClient";
+import { apiDjango } from "../../apiDjango";
 const screenHeight = Dimensions.get("window").height;
 
 const ChatScreen = () => {
@@ -58,20 +60,34 @@ const ChatScreen = () => {
 
     try {
       // Determine API URL based on selectedAPI
-      const apiUrl =
-        selectedAPI === "SFA" ? `${API_URL}/ask` : `${DJANGO_API_URL}/database`;
+      const apiUrl = selectedAPI === "SFA" ? `/ask` : `/database`;
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          question: textInput,
-          model: selectedPlan === "Free" ? "gemini" : "chatgpt",
-        }),
-      });
+      if (selectedAPI === "SFA") {
+        const response = await apiClient(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: textInput,
+            model: selectedPlan === "Free" ? "gemini" : "chatgpt",
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch response from the server.");
+        if (!response.ok) {
+          throw new Error("Failed to fetch response from the server.");
+        }
+      } else {
+        const response = await apiDjango(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: textInput,
+            model: selectedPlan === "Free" ? "gemini" : "chatgpt",
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch response from the server.");
+        }
       }
 
       const data = await response.json();
@@ -80,10 +96,10 @@ const ChatScreen = () => {
         text: data.result,
         sender: "bot",
       };
-      if(selectedPlan==="Free"){
-        setRequestLeft(data.requests_left)
-      }else{
-        setToken(data.cumulative_cost)
+      if (selectedPlan === "Free") {
+        setRequestLeft(data.requests_left);
+      } else {
+        setToken(data.cumulative_cost);
       }
 
       setMessages((prevMessages) => [...prevMessages, botResponse]);
@@ -136,89 +152,122 @@ const ChatScreen = () => {
 
   return (
     <KeyboardAvoidingView
-    style={styles.container}
-    behavior={Platform.OS === "ios" ? "padding" : undefined} // Behavior for iOS
-    keyboardVerticalOffset={85}
-  >
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-    <View style={styles.container}>
-      {/* Gradient for the top half */}
-      <LinearGradient
-        colors={["#405de5", "#263788"]}
-        style={styles.gradientBackground}
-      />
-
-      <View style={styles.contentContainer}>
-        <View style={styles.rowContainer}>
-          <TokenModelSelector
-            modelSelected={selectedAPI === "SQL" ? "Pro" : "gemini"}
-            tokenCount={parseFloat(token).toFixed(4)}
-            RequestsLeft={requestLeft}
-            onSelectedPlanChange={handleSelectedPlanChange}
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined} // Behavior for iOS
+      keyboardVerticalOffset={85}
+    >
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={styles.container}>
+          {/* Gradient for the top half */}
+          <LinearGradient
+            colors={["#405de5", "#263788"]}
+            style={styles.gradientBackground}
           />
-        </View>
-      </View>
-      <View style={styles.solidBackground}>
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={renderMessage}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.chatContent}
-        />
-        {isBotTyping && (
-          <View style={styles.typingContainer}>
-            <ActivityIndicator size="small" color="#4361EE" />
-            <Text style={styles.typingText}>{loadingWord}</Text>
+
+          <View style={styles.contentContainer}>
+            <View style={styles.rowContainer}>
+              <TokenModelSelector
+                modelSelected={selectedAPI === "SQL" ? "Pro" : "gemini"}
+                tokenCount={parseFloat(token).toFixed(4)}
+                RequestsLeft={requestLeft}
+                onSelectedPlanChange={handleSelectedPlanChange}
+              />
+            </View>
           </View>
-        )}
-        <View style={styles.inputBar}>
-          <TouchableOpacity
-            style={styles.dropdownToggle}
-            onPress={() => setIsDropdownOpen((prev) => !prev)}
-          >
-            <Text style={styles.dropdownText}>{selectedAPI}</Text>
-            <Icon
-              name={isDropdownOpen ? "chevron-up" : "chevron-down"}
-              size={20}
-              color="#fff"
+          <View style={styles.solidBackground}>
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              renderItem={renderMessage}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.chatContent}
             />
-          </TouchableOpacity>
-          {isDropdownOpen && (
-            <View style={styles.dropdownMenu}>
-              <TouchableOpacity
-                style={styles.dropdownItem}
-                onPress={() => {
-                  setSelectedAPI("SFA");
-                  setIsDropdownOpen(false);
+            {isBotTyping && (
+              <View style={styles.typingContainer}>
+                <ActivityIndicator size="small" color="#4361EE" />
+                <Text style={styles.typingText}>{loadingWord}</Text>
+              </View>
+            )}
+            {requestLeft <= 0 &&
+            selectedAPI === "SQL" &&
+            selectedPlan === "Free" ? (
+              <Text
+                style={{
+                  color: "white",
+                  backgroundColor: "red",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  width: "100%",
+                  margin: "10px 0",
                 }}
               >
-                <Text style={styles.dropdownItemText}>SFA</Text>
+                You have reached the request limit. Please wait 24 hours before
+                submitting new requests.
+              </Text>
+            ) : null}
+
+            <View style={styles.inputBar}>
+              <TouchableOpacity
+                style={styles.dropdownToggle}
+                onPress={() => setIsDropdownOpen((prev) => !prev)}
+              >
+                <Text style={styles.dropdownText}>{selectedAPI}</Text>
+                <Icon
+                  name={isDropdownOpen ? "chevron-up" : "chevron-down"}
+                  size={20}
+                  color="#fff"
+                />
               </TouchableOpacity>
+              {isDropdownOpen && (
+                <View style={styles.dropdownMenu}>
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setSelectedAPI("SFA");
+                      setIsDropdownOpen(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownItemText}>SFA</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setSelectedAPI("SQL");
+                      setIsDropdownOpen(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownItemText}>SQL</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              <TextInput
+                style={styles.textInput}
+                placeholder="Type a message..."
+                value={textInput}
+                onChangeText={setTextInput}
+              />
               <TouchableOpacity
-                style={styles.dropdownItem}
-                onPress={() => {
-                  setSelectedAPI("SQL");
-                  setIsDropdownOpen(false);
-                }}
+                onPress={handleSend}
+                style={[
+                  styles.sendButton,
+                  requestLeft <= 0 &&
+                    selectedAPI === "SQL" &&
+                    selectedPlan === "Free" && { backgroundColor: "gray" },
+                ]}
+                disabled={
+                  requestLeft <= 0 &&
+                  selectedAPI === "SQL" &&
+                  selectedPlan === "Free"
+                }
               >
-                <Text style={styles.dropdownItemText}>SQL</Text>
+                <Icon name="send" size={20} color="white" />
               </TouchableOpacity>
             </View>
-          )}
-          <TextInput
-            style={styles.textInput}
-            placeholder="Type a message..."
-            value={textInput}
-            onChangeText={setTextInput}
-          />
-          <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-            <Icon name="send" size={20} color="white" />
-          </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };
