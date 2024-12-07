@@ -20,7 +20,6 @@ import Markdown from "react-native-markdown-display";
 import { LinearGradient } from "expo-linear-gradient";
 import TokenModelSelector from "../components/TokenModelSelection";
 import { apiClient } from "../../apiClient";
-import { apiDjango } from "../../apiDjango";
 const screenHeight = Dimensions.get("window").height;
 
 const ChatScreen = () => {
@@ -61,36 +60,16 @@ const ChatScreen = () => {
     try {
       // Determine API URL based on selectedAPI
       const apiUrl = selectedAPI === "SFA" ? `/ask` : `/database`;
+        const apiHandler = selectedAPI === "SFA" ? apiClient : apiDjango;
 
-      if (selectedAPI === "SFA") {
-        const response = await apiClient(apiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: textInput,
-            model: selectedPlan === "Free" ? "gemini" : "chatgpt",
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch response from the server.");
-        }
-      } else {
-        const response = await apiDjango(apiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: textInput,
-            model: selectedPlan === "Free" ? "gemini" : "chatgpt",
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch response from the server.");
-        }
-      }
-
-      const data = await response.json();
+      const data = await apiHandler(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: textInput,
+          model: selectedPlan === "Free" ? "gemini" : "chatgpt",
+        }),
+      });
       const botResponse = {
         id: (Date.now() + 1).toString(),
         text: data.result,
