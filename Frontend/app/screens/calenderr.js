@@ -6,6 +6,7 @@ import { API_URL } from "../../env.js";
 import { Dimensions } from "react-native";
 import { useContext } from "react";
 import { AuthContext } from "../../AuthContext"; // Import AuthContext
+import { apiClient } from "../../apiClient.js";
 
 const Calendar = () => {
   const [events, setEvents] = useState({});
@@ -21,8 +22,7 @@ const Calendar = () => {
     const fetchEvents = async () => {
       setIsLoading(true); // Set loading to true
       try {
-        const response = await fetch(`${API_URL}/sfa_eventCalendar`);
-        const data = await response.json();
+        const data = await apiClient(`/sfa_eventCalendar`);
 
         if (data.success) {
           // Transform the events into a suitable format for the calendar
@@ -61,8 +61,8 @@ const Calendar = () => {
       setIsLoading(true); // Set loading to true
 
       try {
-        const response = await fetch(`${API_URL}/sfa_tender`);
-        const data = await response.json();
+        const data = await apiClient(`/sfa_tender`);
+
 
         if (data.success) {
           const currentUserId = userInfo.user.id_profile;

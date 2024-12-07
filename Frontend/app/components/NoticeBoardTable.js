@@ -3,6 +3,7 @@ import { View, ActivityIndicator, Text } from "react-native";
 import TableTenderStage from "./TenderStageTables/TableTenderStage";
 import { API_URL } from "../../env";
 import TableNoticeBoard from "./TableNoticeBoard";
+import { apiClient } from "../../apiClient";
 
 export default function NoticeBoardTable({
   searchQuery,
@@ -32,18 +33,11 @@ export default function NoticeBoardTable({
   useEffect(() => {
     const fetchNotices = async () => {
       try {
-        const response = await fetch(`${API_URL}/notices`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const result = await response.json();
-        if (result.success) {
+        const result = await apiClient(`/notices`);
           setData(result.notices);
           setFilteredData(result.notices); // Initialize filtered data with all data
           console.log("Fetched notices:", result.notices);
-        } else {
-          throw new Error(result.message || "Failed to fetch notices.");
-        }
+
       } catch (error) {
         console.error("Error fetching notices:", error);
         setError(error.message);

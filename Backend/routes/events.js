@@ -1,11 +1,12 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import authenticateToken from "../middleware/auth.js";
 
 const eventCalendar = express.Router();
 eventCalendar.use(express.json());
 const prisma = new PrismaClient();
 
-eventCalendar.get("/sfa_eventCalendar", async (req, res) => {
+eventCalendar.get("/sfa_eventCalendar", authenticateToken, async (req, res) => {
   try {
     const events = await prisma.sfa_calendar.findMany();
 

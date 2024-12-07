@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, ActivityIndicator, Text, TextInput } from "react-native";
 import TableDashboard from "./TableDashboard";
 import { API_URL } from "../../env";
+import { apiClient } from "../../apiClient";
 
 export default function TableTop20Clients({
   year,
@@ -14,14 +15,11 @@ export default function TableTop20Clients({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(
-          `${API_URL}/top20_clients?selected_year=${year}`
+        const {top20Clients} = await apiClient(
+          `/top20_clients?selected_year=${year}`
         );
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
-        }
 
-        const { top20Clients } = await res.json();
+
         console.log("Top 20:", top20Clients); // Log the fetched data
 
         // Format and structure data for TableDashboard

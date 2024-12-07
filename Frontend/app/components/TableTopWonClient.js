@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import TableDashboard from "./TableDashboard";
+import { apiClient } from "../../apiClient";
 import { API_URL } from "../../env";
 
 export default function TableTopWonClient({
@@ -14,14 +15,12 @@ export default function TableTopWonClient({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(
-          `${API_URL}/sfa_tenderTable?selected_year=${year}`
-        );
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
-        }
+        // const res = await fetch(
+        //   `${API_URL}/sfa_tenderTable?selected_year=${year}`
+        // );
+        const { aggregatedData } = await apiClient(`/sfa_tenderTable?selected_year=${year}`);
 
-        const { aggregatedData } = await res.json();
+
         console.log("Fetched Data:", aggregatedData); // Log the fetched data
 
         // Format and structure data for TableDashboard

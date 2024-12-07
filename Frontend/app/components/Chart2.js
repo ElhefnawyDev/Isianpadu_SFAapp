@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, ScrollView, Dimensions } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
-import { API_URL } from "../../env";
+import {apiClient} from "../../apiClient"
 
 
 const BarChartComponent2 = ({year}) => {
@@ -13,8 +13,9 @@ const BarChartComponent2 = ({year}) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_URL}/chart2?selected_year=${year}`);
-        const chartData = await response.json();
+        
+        const chartData = await apiClient(`/chart2?selected_year=${year}`);
+        
 
         setData(chartData.data);
         setSelectedBar(chartData.data[0]);

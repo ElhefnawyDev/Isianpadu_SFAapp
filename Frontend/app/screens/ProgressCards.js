@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import ProgressCard from "../components/ProgressCard";
 import { API_URL } from "../../env.js";
+import { apiClient } from "../../apiClient.js";
 function ProgressCards({ year }) {
   const [todaySubmission, setTodaySubmission] = useState(0);
   const [entryCount, setEntryCount] = useState(0);
@@ -21,13 +22,10 @@ function ProgressCards({ year }) {
       setIsLoading(true); // Set loading to true
 
       try {
-        const res = await fetch(`${API_URL}/sfa_tender`);
+        const info = await apiClient(`/sfa_tender`);
 
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
-        }
 
-        const info = await res.json();
+        
 
         if (info.success && Array.isArray(info.tenders)) {
           const filteredData = info.tenders;

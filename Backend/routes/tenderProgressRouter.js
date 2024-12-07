@@ -1,11 +1,12 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import authenticateToken from "../middleware/auth.js";
 
 const tenderProgressRouter = express.Router();
 tenderProgressRouter.use(express.json());
 const prisma = new PrismaClient();
 
-tenderProgressRouter.get("/tenderProgressRouter", async (req, res) => {
+tenderProgressRouter.get("/tenderProgressRouter", authenticateToken, async (req, res) => {
   try {
     const selected_year = req.query.selected_year;
     if (!selected_year) {

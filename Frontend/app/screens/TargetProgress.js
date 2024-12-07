@@ -11,6 +11,7 @@ import {
 import Speedometer from "../components/Speedometer";
 import { API_URL } from "../../env.js";
 import { Feather } from "@expo/vector-icons"; // Feather icon library
+import { apiClient } from "../../apiClient.js";
 
 const ShowMoreLessButton = ({ isGridView, onPress }) => {
   
@@ -71,15 +72,13 @@ function TargetProgress({ year }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resOne = await fetch(
-          `${API_URL}/tenderProgressRouter?selected_year=${year}`
+        const infoTender = await apiClient(
+          `/tenderProgressRouter?selected_year=${year}`
         );
 
-        if (!resOne.ok) {
-          throw new Error(`HTTP error! Status: ${resOne.status}`);
-        }
+     
 
-        const infoTender = await resOne.json();
+  
 
         // Retrieve minimum target and target value for the selected year
         const targetData = infoTender.data;

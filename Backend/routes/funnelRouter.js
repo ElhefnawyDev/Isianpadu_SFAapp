@@ -1,18 +1,18 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import authenticateToken from '../middleware/auth.js';
 
 const funnelChart = express.Router();
 const prisma = new PrismaClient();
 
-// Endpoint to get funnel data by year
-funnelChart.get('/funnelRouter', async (req, res) => {
-  const { selected_year } = req.query; // Read the year from query parameters
+
+funnelChart.get('/funnelRouter',authenticateToken, async (req, res) => {
+  const { selected_year } = req.query; 
   if (!selected_year) {
     return res.status(400).json({ error: 'selected_year query parameter is required' });
   }
 
   try {
-    // Fetch tender values grouped by stages, excluding deleted tenders and specific stages
     const stagesData = await prisma.sfa_tender.groupBy({
       by: ['id_sfa_stages'],
       _sum: {
@@ -30,7 +30,7 @@ funnelChart.get('/funnelRouter', async (req, res) => {
       },
     });
 
-    // Fetch stage names for each stage ID
+
     const stagesNames = await prisma.sfa_stages.findMany({
       where: {
         stages_id: { in: stagesData.map((stage) => stage.id_sfa_stages) },

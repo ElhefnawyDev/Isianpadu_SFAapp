@@ -1,9 +1,10 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import authenticateToken from "../middleware/auth.js";
 
 const prisma = new PrismaClient();
 const noticeRouter = express.Router();
-noticeRouter.get("/notices", async (req, res) => {
+noticeRouter.get("/notices", authenticateToken, async (req, res) => {
   try {
     const currentDate = new Date();
 

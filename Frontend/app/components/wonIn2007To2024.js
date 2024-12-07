@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { View, StyleSheet, Text, ScrollView, Dimensions } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
-import { API_URL } from "../../env";
+import { AuthContext } from "../../AuthContext";
+
+import { apiClient } from "../../apiClient";
 
 const BarChartComponent = () => {
   const [data, setData] = useState(null);
   const [selectedBar, setSelectedBar] = useState(null);
   const [totalProjects, setTotalProjects] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
+  const { token, removeToken } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await fetch(`${API_URL}/wonIn2007To2024`);
-        const chartData = await response.json();
+      try {  
+        
+        const chartData = await apiClient("/wonIn2007To2024");
         setData(chartData.data);
         setSelectedBar(chartData.data[0]);
         setTotalProjects(chartData.totalProjects);

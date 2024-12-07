@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import TableDashboard from "./TableDashboard";
+import { apiClient } from "../../apiClient";
 import { API_URL } from "../../env";
 
 export default function TableTopProspectCategory({
@@ -16,15 +17,8 @@ export default function TableTopProspectCategory({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(
-          `${API_URL}/top_category_Prospect?selected_year=${year}`
-        );
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
-        }
 
-        const { categoryProspectData, totalCategoryProspectCount, totalCost } =
-          await res.json();
+        const { categoryProspectData, totalCategoryProspectCount, totalCost }= await apiClient(`/top_category_Prospect?selected_year=${year}`);
 
         // Calculate totalCost from data if needed
         const sumCost = categoryProspectData.reduce(

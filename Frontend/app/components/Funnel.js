@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Dim
 import Svg, { Polygon } from 'react-native-svg';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { API_URL } from "../../env";
+import { apiClient } from '../../apiClient';
 const formatCurrency = (num) => {
   return new Intl.NumberFormat("en-MY", {
     style: "currency",
@@ -19,8 +20,8 @@ const FunnelChart = ({ year= 2024, setVisibility }) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/funnelRouter?selected_year=${year}`);
-      const data = await response.json();
+      const data = await apiClient(`/funnelRouter?selected_year=${year}`);
+      
 
       const formattedData = data?.dataPoints?.map((item) => ({
         label: item.label,
@@ -30,10 +31,10 @@ const FunnelChart = ({ year= 2024, setVisibility }) => {
       })) || [];
 
       setFunnelData(formattedData);
-      setVisibility(formattedData.length > 0); // Update visibility dynamically
+      setVisibility(formattedData.length > 0); 
     } catch (error) {
       console.error('Error fetching data:', error);
-      setVisibility(false); // Hide funnel on error
+      setVisibility(false); 
     } finally {
       setLoading(false);
     }
@@ -51,7 +52,7 @@ const FunnelChart = ({ year= 2024, setVisibility }) => {
       'Commitment To Buy': '#499CA3',
       Won: '#af7f9b',
     };
-    return colorMapping[label] || '#000000'; // Default to black if label is not found
+    return colorMapping[label] || '#000000'; 
   };
 
   const handleStagePress = (stage) => {

@@ -2,8 +2,13 @@ import React, { useEffect, useState } from "react";
 import { View, ActivityIndicator, Text, TextInput, Dimensions } from "react-native";
 import TableTenderStage from "./TableTenderStage";
 import { API_URL } from "../../../env";
+import { apiClient } from "../../../apiClient";
 
-export default function TableStageTable({ selectedStage, searchQuery, onFilteredDataChange }) {
+export default function TableStageTable({
+  selectedStage,
+  searchQuery,
+  onFilteredDataChange,
+}) {
   const [data, setData] = useState([]); // Data for the table
   const [filteredData, setFilteredData] = useState([]); // Filtered data for the table
   const [loading, setLoading] = useState(true); // Loading indicator
@@ -54,19 +59,18 @@ export default function TableStageTable({ selectedStage, searchQuery, onFiltered
     const fetchTableData = async () => {
       setLoading(true); // Start loading
       try {
-        const response = await fetch(`${API_URL}/tender_stages?sfaStage=${selectedStage}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        if (result && result.data) {
+        const result = await apiClient(
+          `/tender_stages?sfaStage=${selectedStage}`
+        );
           // Process data for specific stages
           const processedData = result.data.map((item) => {
-            const tenderValue = parseFloat(item.tenderValue.replace(/,/g, "")) || 0;
-            const tenderCost = parseFloat(item.tenderCost.replace(/,/g, "")) || 0;
+            const tenderValue =
+              parseFloat(item.tenderValue.replace(/,/g, "")) || 0;
+            const tenderCost =
+              parseFloat(item.tenderCost.replace(/,/g, "")) || 0;
             const marginValue = tenderValue - tenderCost;
-            const marginPercentage = tenderValue !== 0 ? (marginValue / tenderValue) * 100 : 0;
+            const marginPercentage =
+              tenderValue !== 0 ? (marginValue / tenderValue) * 100 : 0;
 
             return {
               ...item,
@@ -77,14 +81,13 @@ export default function TableStageTable({ selectedStage, searchQuery, onFiltered
                 : "Please Update",
             };
           });
-          const totalCost = parseFloat(result.total_tender_value_won.replace(/,/g, "")) || 0;
+          const totalCost =
+            parseFloat(result.total_tender_value_won.replace(/,/g, "")) || 0;
           setTotalTenderValueWon(totalCost);
           setData(processedData);
           setFilteredData(processedData); // Set both data and filteredData initially
           setColumns(columnsMapping[selectedStage] || columnsMapping[1]); // Update columns based on stage
-        } else {
-          throw new Error("Unexpected API response format.");
-        }
+        
       } catch (err) {
         console.error("Error fetching table data:", err);
         setError(err.message);
@@ -125,7 +128,9 @@ export default function TableStageTable({ selectedStage, searchQuery, onFiltered
   }
 
   if (error) {
-    return <Text style={{ color: "red", textAlign: "center" }}>Error: {error}</Text>;
+    return (
+      <Text style={{ color: "red", textAlign: "center" }}>Error: {error}</Text>
+    );
   }
 
   return (
@@ -135,7 +140,6 @@ export default function TableStageTable({ selectedStage, searchQuery, onFiltered
       <TableTenderStage stage={selectedStage} columns={columns} data={filteredData} itemsPerPage={isTablet?13:5}  totalTenderValueWon={formatCurrency(parseInt(totalTenderValueWon))}/>
     </View>
   );
-  
 }
 
 // Currency formatter

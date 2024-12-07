@@ -1,11 +1,11 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-
+import authenticateToken from '../middleware/auth.js';
 const chart2 = express.Router();
 const prisma = new PrismaClient();
 
 // Define the route
-chart2.get('/chart2', async (req, res) => {
+chart2.get('/chart2',authenticateToken, async (req, res) => {
     const { selected_year } = req.query;
 
     // Ensure the selected_year parameter is provided

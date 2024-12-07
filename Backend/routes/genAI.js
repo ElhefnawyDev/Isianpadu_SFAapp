@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import authenticateToken from '../middleware/auth.js';
 const genAI = new GoogleGenerativeAI('AIzaSyDEfH8GKodh8hSXEUM17CS9kH1wgFMlRoc');
 
 

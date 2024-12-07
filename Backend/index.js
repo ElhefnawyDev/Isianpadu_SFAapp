@@ -14,7 +14,7 @@ import eventCalendar from "./routes/events.js";
 import tenderStageTable from "./routes/TenderStageTablesRoute.js";
 import noticeRouter from "./routes/noticeBoardTable.js";
 import chatbot from "./routes/chatgpt.js";
-import gemini from "./routes/GenAI.js";
+import gemini from "./routes/genAI.js";
 
 const app = express();
 app.use(cors());

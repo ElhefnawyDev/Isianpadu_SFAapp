@@ -1,11 +1,12 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import authenticateToken from "../middleware/auth.js";
 
 const tenderStageTable = express.Router();
 tenderStageTable.use(express.json());
 const prisma = new PrismaClient();
 
-tenderStageTable.get("/tender_stages", async (req, res) => {
+tenderStageTable.get("/tender_stages", authenticateToken, async (req, res) => {
   try {
     const { sfaStage } = req.query;
     if (!sfaStage) {

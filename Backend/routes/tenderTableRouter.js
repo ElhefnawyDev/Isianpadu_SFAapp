@@ -1,12 +1,13 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import authenticateToken from "../middleware/auth.js";
 
 const tenderTableRouter = express.Router();
 tenderTableRouter.use(express.json());
 const prisma = new PrismaClient();
 
-// Route for sfa_tender
-tenderTableRouter.get("/sfa_tenderTable", async (req, res) => {
+// Top Client (Won)
+tenderTableRouter.get("/sfa_tenderTable", authenticateToken, async (req, res) => {
   try {
     const { selected_year } = req.query; // Get the selected year from query parameters
 
@@ -53,7 +54,7 @@ tenderTableRouter.get("/sfa_tenderTable", async (req, res) => {
 });
 
 // Route for Top 20 Clients
-tenderTableRouter.get("/top20_clients", async (req, res) => {
+tenderTableRouter.get("/top20_clients", authenticateToken, async (req, res) => {
   try {
     const { selected_year } = req.query; // Get the selected year from query parameters
 
@@ -109,7 +110,7 @@ tenderTableRouter.get("/top20_clients", async (req, res) => {
 
 
 // Route for Top Client (Prospect)
-tenderTableRouter.get("/top_client_prospect", async (req, res) => {
+tenderTableRouter.get("/top_client_prospect",authenticateToken, async (req, res) => {
   try {
     const { selected_year } = req.query; // Get the selected year from query parameters
 
@@ -157,7 +158,7 @@ tenderTableRouter.get("/top_client_prospect", async (req, res) => {
 
 
 // Route for Top Category
-tenderTableRouter.get("/top_category", async (req, res) => {
+tenderTableRouter.get("/top_category", authenticateToken, async (req, res) => {
   try {
     const { selected_year } = req.query; // Get the selected year from query parameters
 
@@ -212,7 +213,7 @@ tenderTableRouter.get("/top_category", async (req, res) => {
 });
 
 // Route for Top Category (Prospect)
-tenderTableRouter.get("/top_category_prospect", async (req, res) => {
+tenderTableRouter.get("/top_category_prospect", authenticateToken, async (req, res) => {
   try {
     const { selected_year } = req.query; // Get the selected year from query parameters
 
@@ -266,7 +267,7 @@ tenderTableRouter.get("/top_category_prospect", async (req, res) => {
 });
 
 // Route for Top Category (Won)
-tenderTableRouter.get("/top_category_won", async (req, res) => {
+tenderTableRouter.get("/top_category_won", authenticateToken, async (req, res) => {
   try {
     const { selected_year } = req.query; // Get the selected year from query parameters
 

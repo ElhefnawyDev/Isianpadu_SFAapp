@@ -1,11 +1,12 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import authenticateToken from '../middleware/auth.js';
 const wonIn2007To2024Router = express.Router();
 
 // Initialize Prisma client
 const prisma = new PrismaClient();
 
-wonIn2007To2024Router.get("/wonIn2007To2024", async (req, res) => {
+wonIn2007To2024Router.get("/wonIn2007To2024", authenticateToken, async (req, res) => {
   try {
     const selectedYear =
       parseInt(req.query.selected_year) || new Date().getFullYear();

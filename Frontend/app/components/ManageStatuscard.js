@@ -10,6 +10,7 @@ import LowProgress3 from "./StatusCards/low/LowProgress3";
 import { API_URL } from "../../env";
 import MediumProgress2 from "./StatusCards/Medium/MediumProgress2";
 import MediumProgress3 from "./StatusCards/Medium/MediumProgress3";
+import { apiClient } from "../../apiClient";
 
 const ManageStatusCard = ({ year }) => {
   const [statusColor, setStatusColor] = useState(null);
@@ -20,16 +21,12 @@ const ManageStatusCard = ({ year }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resOne = await fetch(
-          `${API_URL}/tenderProgressRouter?selected_year=${year}`
+        const infoTender = await apiClient(
+          `/tenderProgressRouter?selected_year=${year}`
         );
 
-        if (!resOne.ok) {
-          throw new Error(`HTTP error! Status: ${resOne.status}`);
-        }
 
-        const infoTender = await resOne.json();
-
+      
         const targetData = infoTender.data;
         if (targetData) {
           const yearlyTarget = parseFloat(targetData.yearly_target) || 0;
