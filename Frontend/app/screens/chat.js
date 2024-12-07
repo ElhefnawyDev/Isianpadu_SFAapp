@@ -8,6 +8,10 @@ import {
   StyleSheet,
   ActivityIndicator,
   Dimensions,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { API_URL } from "../../env";
@@ -131,6 +135,12 @@ const ChatScreen = () => {
   };
 
   return (
+    <KeyboardAvoidingView
+    style={styles.container}
+    behavior={Platform.OS === "ios" ? "padding" : undefined} // Behavior for iOS
+    keyboardVerticalOffset={85}
+  >
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     <View style={styles.container}>
       {/* Gradient for the top half */}
       <LinearGradient
@@ -208,6 +218,8 @@ const ChatScreen = () => {
         </View>
       </View>
     </View>
+    </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

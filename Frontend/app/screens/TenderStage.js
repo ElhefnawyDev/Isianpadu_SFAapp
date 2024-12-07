@@ -57,7 +57,6 @@ export default function TenderStageScreen() {
       <View style={styles.solidBackground}>
         <ScrollView contentContainerStyle={styles.contentContainer}>
           {/* Tender Stage Table */}
-          {screenWidth<388 && <Text></Text>}
           <TenderStageTable
             searchQuery={searchQuery}
             selectedStage={stageNumber}
@@ -87,16 +86,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    top: "18%",
+    top: screenWidth<388? "20%":"18%",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     backgroundColor: "white",
-    zIndex: 1,
+    zIndex: 20,
   },
   contentContainer: {
     alignItems: "center",
-    paddingBottom: 40,
-    zIndex: 10,
+    zIndex: 21,
   },
   rowContainer: {
     flexDirection: "column",

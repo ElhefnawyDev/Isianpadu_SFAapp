@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { View, TouchableOpacity, Text, ScrollView } from "react-native";
+import { View, TouchableOpacity, Text, ScrollView, Dimensions } from "react-native";
 import _ from "lodash";
 import styles from "./Table.style";
 import Feather from "@expo/vector-icons/Feather";
@@ -13,6 +13,8 @@ function TableDashboard({ data, totalSubmission, totalCost, column, type }) {
   const [expandedRow, setExpandedRow] = useState(null);
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
+  const { width } = Dimensions.get('window'); // Get the screen width
+  const isTablet = width >= 600; // Define a threshold for tablets (e.g., 600px)
 
   useEffect(() => {
     setTableData(data);
@@ -144,9 +146,11 @@ function TableDashboard({ data, totalSubmission, totalCost, column, type }) {
               <View style={styles.rowContainer}>
                 {/* Fixed Column for Client Name with truncated name */}
                 <Text style={styles.columnRowTxtName}>
-                  {item.name.length > 17
+                  {isTablet ?item.name.length > 50
+                    ? `${item.name.substring(0, 50)}...`
+                    : item.name : item.name.length > 17
                     ? `${item.name.substring(0, 17)}...`
-                    : item.name}
+                    : item.name }
                 </Text>
   
                 {/* Dynamic Column for Cost/Tender */}

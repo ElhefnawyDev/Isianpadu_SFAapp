@@ -8,6 +8,7 @@ import NoticeBoardTable from "../components/NoticeBoardTable";
 import TableIconsNoticeBoard from "../components/TableIconsNoticeBoard";
 
 const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width;
 
 export default function TenderStageScreen() {
   const [searchQuery, setSearchQuery] = useState(""); // Shared search state
@@ -62,11 +63,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    top: "11%",
-    borderTopLeftRadius: 20,
+    top: screenWidth<388? "13%":"12%",    borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     backgroundColor: "white",
-    zIndex: 1,
+    zIndex: 20,
   },
   contentContainer: {
     alignItems: "center",

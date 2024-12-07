@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { View, TouchableOpacity, Text, ScrollView } from "react-native";
+import { View, TouchableOpacity, Text, ScrollView,Dimensions } from "react-native";
 import _ from "lodash";
 import styles from "../Table.style";
 import Feather from "@expo/vector-icons/Feather";
@@ -25,6 +25,8 @@ function TableTenderStage({ columns, data, itemsPerPage = 5, totalTenderValueWon
   const [expandedRow, setExpandedRow] = useState(null);
   const [currentColumn, setCurrentColumn] = useState(columns[0].displayName);
   const [page, setPage] = useState(1);
+  const { width } = Dimensions.get('window'); // Get the screen width
+  const isTablet = width >= 600; // Define a threshold for tablets (e.g., 600px)
 
   const sortTable = useCallback(
     (column) => {
@@ -136,7 +138,9 @@ function TableTenderStage({ columns, data, itemsPerPage = 5, totalTenderValueWon
           <View key={index}>
             <View style={styles.rowContainer}>
               <Text style={styles.columnRowTxtName}>
-                {item.tenderShortname.length > 17
+                {isTablet ?item.tenderShortname.length > 50
+                  ? `${item.tenderShortname.substring(0, 50)}...`
+                  : item.tenderShortname : item.tenderShortname.length > 17
                   ? `${item.tenderShortname.substring(0, 17)}...`
                   : item.tenderShortname}
               </Text>

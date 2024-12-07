@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator, Text, TextInput } from "react-native";
+import { View, ActivityIndicator, Text, TextInput, Dimensions } from "react-native";
 import TableTenderStage from "./TableTenderStage";
 import { API_URL } from "../../../env";
 
@@ -9,6 +9,8 @@ export default function TableStageTable({ selectedStage, searchQuery, onFiltered
   const [loading, setLoading] = useState(true); // Loading indicator
   const [error, setError] = useState(null); // Error handling state
   const [totalTenderValueWon, setTotalTenderValueWon] = useState("0");
+  const { width } = Dimensions.get('window'); // Get the screen width
+  const isTablet = width >= 600; // Define a threshold for tablets (e.g., 600px)
 
   const columnsMapping = {
     1: [
@@ -130,7 +132,7 @@ export default function TableStageTable({ selectedStage, searchQuery, onFiltered
     <View>
       <Text></Text>
       {/* Remove or replace the empty Text */}
-      <TableTenderStage stage={selectedStage} columns={columns} data={filteredData} itemsPerPage={5}  totalTenderValueWon={formatCurrency(parseInt(totalTenderValueWon))}/>
+      <TableTenderStage stage={selectedStage} columns={columns} data={filteredData} itemsPerPage={isTablet?13:5}  totalTenderValueWon={formatCurrency(parseInt(totalTenderValueWon))}/>
     </View>
   );
   

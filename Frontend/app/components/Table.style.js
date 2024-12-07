@@ -1,6 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window'); // Get the screen width
+const isTablet = width >= 600; // Define a threshold for tablets (e.g., 600px)
 
 export default StyleSheet.create({
   container: {
@@ -65,9 +66,10 @@ export default StyleSheet.create({
     alignItems: 'center',
     },
   navigationContainerChild: {
-    paddingStart: 60,
-    justifyContent: 'end',
-    alignItems: 'end',
+    width: isTablet ? "27%" : "23%", // Use 25% if it's a tablet, otherwise 23%
+    paddingBottom:5,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
     
   },
   dropdownContainer: {
