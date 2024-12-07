@@ -50,7 +50,7 @@ export default function Login() {
       />
 
       <Image style={styles.logo} source={require("../assets/logo.png")} />
-      <Text style={styles.title}>SFA SYSTEM</Text>
+      <Text style={styles.title}>SFA 360</Text>
 
       <Text style={styles.subtitle}>SIGN IN</Text>
       <TextInput

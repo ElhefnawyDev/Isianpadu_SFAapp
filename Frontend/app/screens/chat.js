@@ -1,3 +1,4 @@
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { useState, useRef, useEffect } from "react";
 import {
   View,
@@ -20,6 +21,7 @@ import Markdown from "react-native-markdown-display";
 import { LinearGradient } from "expo-linear-gradient";
 import TokenModelSelector from "../components/TokenModelSelection";
 import { apiClient } from "../../apiClient";
+import { apiDjango } from "../../apiDjango";
 const screenHeight = Dimensions.get("window").height;
 
 const ChatScreen = () => {
@@ -33,6 +35,9 @@ const ChatScreen = () => {
   const [requestLeft, setRequestLeft] = useState(); // Dropdown visibility
   const flatListRef = useRef();
   const [selectedPlan, setSelectedPlan] = useState("Free");
+  const insets = useSafeAreaInsets();
+
+
   const handleSelectedPlanChange = (plan) => {
     setSelectedPlan(plan);
   };
@@ -128,65 +133,76 @@ const ChatScreen = () => {
       </View>
     );
   };
-
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined} // Behavior for iOS
-      keyboardVerticalOffset={85}
-    >
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.container}>
-          {/* Gradient for the top half */}
-          <LinearGradient
-            colors={["#405de5", "#263788"]}
-            style={styles.gradientBackground}
+    <View style={styles.container}>
+      {/* Top Section with Gradient */}
+      <LinearGradient
+        colors={["#405de5", "#263788"]}
+        style={styles.gradientBackground}
+      />
+  
+      {/* Content Section */}
+      <View style={styles.contentContainer}>
+        <View style={styles.rowContainer}>
+          <TokenModelSelector
+            modelSelected={selectedAPI === "SQL" ? "Pro" : "gemini"}
+            tokenCount={parseFloat(token).toFixed(4)}
+            RequestsLeft={requestLeft}
+            onSelectedPlanChange={handleSelectedPlanChange}
           />
-
-          <View style={styles.contentContainer}>
-            <View style={styles.rowContainer}>
-              <TokenModelSelector
-                modelSelected={selectedAPI === "SQL" ? "Pro" : "gemini"}
-                tokenCount={parseFloat(token).toFixed(4)}
-                RequestsLeft={requestLeft}
-                onSelectedPlanChange={handleSelectedPlanChange}
-              />
-            </View>
+        </View>
+      </View>
+  
+      {/* Chat Section */}
+      <View style={styles.solidBackground}>
+        {/* Messages List */}
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.chatContent}
+        />
+  
+        {/* Bot Typing Indicator */}
+        {isBotTyping && (
+          <View style={styles.typingContainer}>
+            <ActivityIndicator size="small" color="#4361EE" />
+            <Text style={styles.typingText}>{loadingWord}</Text>
           </View>
-          <View style={styles.solidBackground}>
-            <FlatList
-              ref={flatListRef}
-              data={messages}
-              renderItem={renderMessage}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.chatContent}
-            />
-            {isBotTyping && (
-              <View style={styles.typingContainer}>
-                <ActivityIndicator size="small" color="#4361EE" />
-                <Text style={styles.typingText}>{loadingWord}</Text>
-              </View>
-            )}
-            {requestLeft <= 0 &&
-            selectedAPI === "SQL" &&
-            selectedPlan === "Free" ? (
-              <Text
-                style={{
-                  color: "white",
-                  backgroundColor: "red",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  width: "100%",
-                  margin: "10px 0",
-                }}
-              >
-                You have reached the request limit. Please wait 24 hours before
-                submitting new requests.
-              </Text>
-            ) : null}
-
+        )}
+  
+        {/* Request Limit Warning */}
+        {requestLeft <= 0 &&
+        selectedAPI === "SQL" &&
+        selectedPlan === "Free" ? (
+          <Text
+            style={{
+              color: "white",
+              backgroundColor: "red",
+              padding: "10px",
+              borderRadius: "5px",
+              fontWeight: "bold",
+              textAlign: "center",
+              width: "100%",
+              margin: "10px 0",
+            }}
+          >
+            You have reached the request limit. Please wait 24 hours before
+            submitting new requests.
+          </Text>
+        ) : null}
+  
+        {/* Input Section */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={  screenHeight < 850 
+            ? insets.bottom + 145 
+            : screenHeight < 1250 
+              ? insets.bottom + 170 
+              : insets.bottom + 205}
+        >
+          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View style={styles.inputBar}>
               <TouchableOpacity
                 style={styles.dropdownToggle}
@@ -244,12 +260,12 @@ const ChatScreen = () => {
                 <Icon name="send" size={20} color="white" />
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </View>
+    </View>
   );
-};
+}  
 
 const markdownStyles = StyleSheet.create({
   // The main container

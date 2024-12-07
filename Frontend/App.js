@@ -1,5 +1,13 @@
-import { useState, useEffect, useRef, useContext } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity, Button, Platform  } from "react-native";
+import { useState, useEffect, useRef, useContext } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Button,
+  Platform,
+} from "react-native";
 import { AuthProvider, AuthContext } from "./AuthContext";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -13,7 +21,7 @@ import {
   MaterialCommunityIcons,
   Feather,
   FontAwesome5,
-  Ionicons
+  Ionicons,
 } from "@expo/vector-icons";
 import DashboardScreen from "./app/screens/Dashboard";
 import TenderStageScreen from "./app/screens/TenderStage";
@@ -25,9 +33,10 @@ import { useNavigation } from "@react-navigation/native"; // Import useNavigatio
 import FloatableButtonScreen from "./app/components/FloatingButton";
 import ChatScreen from "./app/screens/chat";
 import ChatBot from "./app/screens/ChartsScreen";
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
-import { API_URL } from './env';
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import { API_URL } from "./env";
+import { apiClient } from "./apiClient";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -46,9 +55,12 @@ const Drawer = createDrawerNavigator();
 
 async function scheduleTenderNotification(tender) {
   const tenderDeadline = new Date(tender.deadline);
-  const formattedDeadline = `${tenderDeadline.getDate().toString().padStart(2, "0")}/${
-    (tenderDeadline.getMonth() + 1).toString().padStart(2, "0")
-  }/${tenderDeadline.getFullYear()}`;
+  const formattedDeadline = `${tenderDeadline
+    .getDate()
+    .toString()
+    .padStart(2, "0")}/${(tenderDeadline.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}/${tenderDeadline.getFullYear()}`;
 
   await Notifications.scheduleNotificationAsync({
     content: {
@@ -62,13 +74,9 @@ async function scheduleTenderNotification(tender) {
 
 async function fetchTenderData(userId) {
   try {
-    const response = await fetch(`${API_URL}/sfa_tender`);
-    if (!response.ok) throw new Error("Failed to fetch tender data");
-
-    const tenderData = await response.json();
+    const tenderData = await apiClient(`/sfa_tender`);
     if (tenderData.success) {
       const currentDate = new Date();
-
       const oneMonthFromNow = new Date();
       oneMonthFromNow.setMonth(currentDate.getMonth() + 1);
 
@@ -102,7 +110,9 @@ async function fetchTenderData(userId) {
 
       // Schedule notifications for filtered tenders
       filteredTenders.forEach((tender) => {
-        console.log(`Scheduling notification for tender: ${tender.tender_shortname}`);
+        console.log(
+          `Scheduling notification for tender: ${tender.tender_shortname}`
+        );
         scheduleTenderNotification(tender);
       });
     }
@@ -110,8 +120,6 @@ async function fetchTenderData(userId) {
     console.error("Error fetching tenders:", error.message);
   }
 }
-
-
 
 function CustomDrawerContent(props) {
   const { userInfo } = useContext(AuthContext); // Access userInfo from AuthContext
@@ -144,9 +152,9 @@ function CustomDrawerContent(props) {
 }
 
 function AppNavigation() {
-  const { token, removeToken, userInfo, } = useContext(AuthContext);
-  const res = JSON.stringify(userInfo)
-  console.log("resid: "+res)
+  const { token, removeToken, userInfo } = useContext(AuthContext);
+  const res = JSON.stringify(userInfo);
+  console.log("resid: " + res);
 
   useEffect(() => {
     if (token && userInfo) {
@@ -159,7 +167,7 @@ function AppNavigation() {
       }
     }
   }, [token]); // Remove userInfo as a dependency to prevent unnecessary triggers.
-  
+
   // Logout function
   const handleLogout = () => {
     removeToken(); // Remove the token and reset the auth state
@@ -221,7 +229,7 @@ function AppNavigation() {
                         case "Notice Board":
                           return NoticeBoardScreen;
                         case "ChatBot":
-                          return ChatScreen;                         
+                          return ChatScreen;
                         default:
                           return DashboardScreen; // Default fallback screen
                       }
@@ -246,7 +254,7 @@ function AppNavigation() {
                             size={24}
                             color={focused ? "#3953cd" : "black"}
                           />
-                        ): (
+                        ) : (
                           <Ionicons
                             name={drawer.iconName}
                             size={24}
@@ -289,22 +297,28 @@ function DashboardScreenWithLogout({ navigation }) {
 }
 
 const App = () => {
-  const [expoPushToken, setExpoPushToken] = useState('');
+  const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
   useEffect(() => {
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
 
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      setNotification(notification);
-    });
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+      });
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
     return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
@@ -316,46 +330,42 @@ const App = () => {
     </AuthProvider>
   );
 };
-async function schedulePushNotification() {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Tender Deadline Alert!",
-      body: `Tender ${tender.tender_shortname} is approaching its deadline: ${formattedDeadline}`,
-      data: { tenderId: tender.tender_id },
-    },
-    trigger: { seconds: 2 },
-  });
-}
-
 async function registerForPushNotificationsAsync() {
   let token;
 
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
+      lightColor: "#FF231F7C",
     });
   }
 
   if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
+
+    if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
+
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
       return;
     }
+
     token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log(token);
+    console.log("Push token:", token);
+  } else {
+    alert("Must use a physical device for push notifications");
   }
 
   return token;
 }
+
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#fff" },
   header: {
