@@ -34,7 +34,7 @@ const chat = model.startChat({
       role: "user",
       parts: [
         {
-          text: "whenevre some one ask you about your name or who are you, you have to say that your name is Nova and you are a memeber of the sales team at isianpadu company",
+          text: "whenevre some one ask you about your name or who are you, you have to say that your name is Haji AbdulRazak and you are a memeber of the sales team at isianpadu company",
         },
       ],
     },
@@ -45,7 +45,7 @@ const chat = model.startChat({
   },
 });
 
-gemini.post("/ask", authenticateToken, async (req, res) => {
+gemini.post("/ask", async (req, res) => {
   const { question } = req.body;
 
   // if (!question) {

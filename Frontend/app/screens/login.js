@@ -50,7 +50,8 @@ export default function Login() {
       />
 
       <Image style={styles.logo} source={require("../assets/logo.png")} />
-      <Text style={styles.title}>SFA SYSTEM</Text>
+      <Image style={styles.logo2} source={require("../assets/login_icon.png")} />
+
 
       <Text style={styles.subtitle}>SIGN IN</Text>
       <TextInput
@@ -100,6 +101,13 @@ const styles = StyleSheet.create({
     width: 120,
     resizeMode: "contain",
   },
+  logo2: {
+    position: "absolute",
+    top: "10%",
+    height: 220,
+    width: 220,
+    resizeMode: "contain",
+  },
 
   title: {
     position: "absolute",
@@ -111,13 +119,13 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     position: "absolute",
-    top: "28%",
+    top: "30%",
     fontSize: 16,
     color: "#666",
     marginBottom: 20,
   },
   input: {
-    height: 40,
+    height: 50,
     width: "100%",
     borderBottomWidth: 1,
     borderBottomColor: "#333",

@@ -45,7 +45,7 @@ const ChatScreen = () => {
 
   const handleSend = async () => {
     if (textInput.trim() === "") return;
-
+  
     const userMessage = {
       id: Date.now().toString(),
       text: textInput,
@@ -53,16 +53,16 @@ const ChatScreen = () => {
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setTextInput(""); // Clear the input
-
+  
     // Set bot typing state
     setIsBotTyping(true);
-
+  
     try {
       // Determine API URL based on selectedAPI
-      const apiUrl = selectedAPI === "SFA" ? `/ask` : `/database`;
-        const apiHandler = selectedAPI === "SFA" ? apiClient : apiDjango;
-
-      const data = await apiHandler(apiUrl, {
+      const apiUrl = selectedAPI === "SFA" ? `${API_URL}/ask` : `${DJANGO_API_URL}/database`;
+  
+      // Make the request
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -70,20 +70,27 @@ const ChatScreen = () => {
           model: selectedPlan === "Free" ? "gemini" : "chatgpt",
         }),
       });
+  
+      // Ensure response is in JSON format
+      const result = await response.json();
+  
+      // Create the bot response
       const botResponse = {
         id: (Date.now() + 1).toString(),
-        text: data.result,
+        text: result.result, // Ensure `result.result` exists and contains the expected data
         sender: "bot",
       };
+  
       if (selectedPlan === "Free") {
-        setRequestLeft(data.requests_left);
+        setRequestLeft(result.requests_left);
       } else {
-        setToken(data.cumulative_cost);
+        setToken(result.cumulative_cost);
       }
-
+  
       setMessages((prevMessages) => [...prevMessages, botResponse]);
     } catch (error) {
       console.error("Error:", error);
+  
       const errorResponse = {
         id: (Date.now() + 1).toString(),
         text: "Sorry, something went wrong.",

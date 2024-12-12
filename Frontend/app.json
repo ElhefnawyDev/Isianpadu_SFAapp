@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "SFAapp",
-    "slug": "SFAapp",
-    "version": "1.0.0",
+    "name": "SFA 365",
+    "slug": "SFA 365",
+    "version": "0.0.1",
     "orientation": "portrait",
-    "icon": "./app/assets/logo.png",
+    "icon": "./app/assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./app/assets/logo.png",
@@ -16,7 +16,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./app/assets/logo.png",
+        "foregroundImage": "./app/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.anonymous.SFAapp"

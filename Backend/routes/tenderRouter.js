@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 
 // Route for sfa_tender
-tenderRouter.get("/sfa_tender", async (req, res) => {
+tenderRouter.get("/sfa_tender", authenticateToken, async (req, res) => {
     try {
       const tenders = await prisma.sfa_tender.findMany({
         select: {

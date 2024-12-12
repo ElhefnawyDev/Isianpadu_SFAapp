@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'SFAapp'
+rootProject.name = 'SFA 365'
 
 dependencyResolutionManagement {
   versionCatalogs {
